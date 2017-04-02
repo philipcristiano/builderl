@@ -1,0 +1,6 @@
+
+stages:
+  - name: package
+    steps:
+      - make package
+      - make publish
