@@ -5,7 +5,7 @@
 
 
 build(GitRepo, Opts) ->
-    Time = erlang:monotonic_time(second),
+    Time = erlang:monotonic_time(seconds),
     Path = "/tmp/" ++ lists:flatten(io_lib:format("build~p",[Time])),
     io:format("Build ~p~n", [{GitRepo, Path}]),
     BuilderlFile = Path ++ "/builderl.yml",
