@@ -30,7 +30,7 @@ clone_if_needed(true, _GitRepo, Path) ->
 
 build_project(CWD, BuilderlFile) ->
     io:format("Build project ~p~n", [BuilderlFile]),
-    {ok, [BuildConfig]} = yaml:load_file(BuilderlFile),
+    {ok, [BuildConfig]} = fast_yaml:decode_from_file(BuilderlFile),
     io:format("File ~p~n", [BuildConfig]),
     Stages = maps:get(<<"stages">>, BuildConfig),
     execute_stages(Stages, CWD),
