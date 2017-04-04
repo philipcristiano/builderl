@@ -13,7 +13,7 @@ dep_sync = git https://github.com/rustyio/sync.git master
 
 DEP_PLUGINS = cowboy
 
-SHELL_OPTS = -eval 'application:ensure_all_started(builderl), sync:go().'
+SHELL_OPTS = -eval 'application:ensure_all_started(builderl), sync:go().' -config builderl
 
 package: rel
 	rm -rf ${BUILDDIR} ${BUILDTMP}
