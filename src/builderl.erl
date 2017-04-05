@@ -46,7 +46,7 @@ execute_stages([], _Dir) ->
 
 
 execute_steps([Step|Steps], Dir) ->
-    io:format("Step: ~p~n", [Step]),
+    io:format("Step: ~p in ~p~n", [Step, Dir]),
     {ok, _} = exec:run(Step, [{stdout, print}, {stderr, print}, {cd, Dir}, sync]),
     execute_steps(Steps, Dir),
     ok;
