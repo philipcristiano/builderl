@@ -2,16 +2,16 @@ PROJECT = builderl
 PROJECT_DESCRIPTION = New project
 PROJECT_VERSION = 0.1.0
 
-DEPS = cowboy erlexec erlgit sh yamler jsx fast_yaml
+DEPS = cowboy erlexec erlgit sh jsx yamerl
+LOCAL_DEPS = sasl
 SHELL_DEPS = sync
 dep_cowboy_commit = 2.0.0-pre.7
 dep_erlexec = git https://github.com/saleyn/erlexec.git 1.2.2
 dep_erlgit = git https://github.com/gleber/erlgit v0.7.5
 dep_sh = git https://github.com/gleber/sh.git master
-dep_yamler = git https://github.com/goertzenator/yamler.git master
-dep_fast_yaml = git https://github.com/processone/fast_yaml.git 1.0.9
 dep_sync = git https://github.com/rustyio/sync.git master
 dep_jsx = git https://github.com/talentdeficit/jsx.git v2.8.2
+dep_yamerl = git https://github.com/yakaz/yamerl.git v0.4.0
 
 DEP_PLUGINS = cowboy
 
@@ -19,6 +19,7 @@ SHELL_OPTS = -eval 'application:ensure_all_started(builderl), sync:go().' -confi
 
 # Building on OmniOS
 # CC=gcc CXX="/usr/bin/g++ -m64" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make app
+# with fast_yaml (not working yet CPATH=/opt/omni/lib CPPFLAGS="-I/opt/omni/include/amd64" CFLAGS="-I/opt/omni/include/amd64" LDFLAGS="-L/opt/omni/lib/amd64" CC=gcc CXX="/usr/bin/g++ -m64" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make deps app shell
 
 package: rel
 	rm -rf ${BUILDDIR} ${BUILDTMP}

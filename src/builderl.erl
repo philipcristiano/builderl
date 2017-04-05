@@ -30,14 +30,14 @@ clone_if_needed(true, _GitRepo, Path) ->
 
 build_project(CWD, BuilderlFile) ->
     io:format("Build project ~p~n", [BuilderlFile]),
-    {ok, [BuildConfig]} = fast_yaml:decode_from_file(BuilderlFile),
+    [BuildConfig] = yamerl_constr:file(BuilderlFile),
     io:format("File ~p~n", [BuildConfig]),
-    Stages = maps:get(<<"stages">>, BuildConfig),
+    Stages = proplists:get_value("stages", BuildConfig),
     execute_stages(Stages, CWD),
     ok.
 
 execute_stages([Stage|Stages], Dir) ->
-    Steps = maps:get(<<"steps">>, Stage),
+    Steps = proplists:get_value("steps", Stage),
     execute_steps(Steps, Dir),
     execute_stages(Stages, Dir),
     ok;
@@ -47,8 +47,7 @@ execute_stages([], _Dir) ->
 
 execute_steps([Step|Steps], Dir) ->
     io:format("Step: ~p~n", [Step]),
-    SStep = binary:bin_to_list(Step),
-    exec:run(SStep, [{stdout, print}, {cd, Dir}]),
+    exec:run(Step, [{stdout, print}, {cd, Dir}]),
     execute_steps(Steps, Dir),
     ok;
 execute_steps([], _Dir) ->
