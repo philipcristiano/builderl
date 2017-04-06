@@ -20,6 +20,21 @@ SHELL_OPTS = -eval 'application:ensure_all_started(builderl), sync:go().' -confi
 # Building on OmniOS
 # CC=gcc CXX="/usr/bin/g++ -m64" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make app
 # with fast_yaml (not working yet CPATH=/opt/omni/lib CPPFLAGS="-I/opt/omni/include/amd64" CFLAGS="-I/opt/omni/include/amd64" LDFLAGS="-L/opt/omni/lib/amd64" CC=gcc CXX="/usr/bin/g++ -m64" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make deps app shell
+#
+BUILD_TIME=$(shell TZ=UTC date +"%Y%m%dT%H%M%SZ")
+export IPS_FMRI=server/${PROJECT}@${PROJECT_VERSION}:${BUILD_TIME}
+export IPS_DESCRIPTION=${PROJECT_DESCRIPTION}
+export IPS_SUMMARAY=${IPS_DESCRIPTION}
+#PKG_VERSION	?= $(shell git describe --tags | tr - .)
+ARCH=$(shell uname -p)
+
+define IPS_METADATA
+set name=pkg.fmri value=${IPS_FMRI}
+set name=pkg.description value="${IPS_DESCRIPTION}"
+set name=pkg.summary value="${IPS_SUMMARAY}"
+set name=variant.arch value=${ARCH}
+endef
+export IPS_METADATA
 
 package: rel
 	rm -rf ${BUILDDIR} ${BUILDTMP}
