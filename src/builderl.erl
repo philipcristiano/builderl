@@ -51,7 +51,7 @@ execute_steps([Step|Steps], Dir) ->
     % EnvOpt = {env, [{"foo", "bar"},
     %                 {"APP_DIR", ""}]},
     Env = get_empty_env(),
-    builderl_process:run(Step, Dir, Env),
+    0 = builderl_process:run(Step, Dir, Env),
     % {ok, _} = exec:run(Step, [{stdout, print}, {stderr, print}, {cd, Dir}, sync, EnvOpt]),
     execute_steps(Steps, Dir),
     ok;

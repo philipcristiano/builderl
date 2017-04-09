@@ -10,7 +10,8 @@ run(Command, Dir, Env) ->
         [stream, stderr_to_stdout, binary, exit_status,
          {args, Args}, {cd, Dir}, {env, Env}]),
     Status = loop(Port),
-    io:format("Status ~p~n",[Status]).
+    io:format("Status ~p~n",[Status]),
+    Status.
 
 
 loop(Port) ->
