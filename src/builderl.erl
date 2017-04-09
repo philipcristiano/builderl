@@ -1,6 +1,7 @@
 -module(builderl).
 
 -export([build/2,
+         get_empty_env/0,
          run/0]).
 
 
@@ -49,7 +50,8 @@ execute_steps([Step|Steps], Dir) ->
     io:format("Step: ~p in ~p~n", [Step, Dir]),
     % EnvOpt = {env, [{"foo", "bar"},
     %                 {"APP_DIR", ""}]},
-    builderl_process:run(Step, Dir, []),
+    Env = get_empty_env(),
+    builderl_process:run(Step, Dir, Env),
     % {ok, _} = exec:run(Step, [{stdout, print}, {stderr, print}, {cd, Dir}, sync, EnvOpt]),
     execute_steps(Steps, Dir),
     ok;
@@ -62,3 +64,13 @@ checkout_ref(Path, Ref) ->
 
 run() ->
     build("git@github.com:philipcristiano/AWSMF-Data.git", [{ref, "package"}, {commit_ish, "package"}]).
+
+get_empty_env() ->
+    Env = os:getenv(),
+    empty_env(Env).
+
+empty_env([Envvar|T]) ->
+    [Key, _Value] = re:split(Envvar, "=", [{parts, 2}]),
+    [{binary:bin_to_list(Key), false} | empty_env(T)];
+empty_env([]) ->
+    [].
