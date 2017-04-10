@@ -2,6 +2,7 @@
 
 -export([build/2,
          get_empty_env/0,
+         get_global_env/0,
          run/0]).
 
 
