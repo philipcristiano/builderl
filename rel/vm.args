@@ -1,3 +1,4 @@
 -name builderl@127.0.0.1
 -setcookie builderl
 -heart
+-start_epmd false
