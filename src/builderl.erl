@@ -82,7 +82,7 @@ merge_env(Env1, Env2) ->
     orddict:merge(fun(_,_X,Y) -> Y end, orddict:from_list(Env1), orddict:from_list(Env2)).
 
 get_global_env() ->
-    Config = application:get_env(builder, global_env, []),
+    Config = application:get_env(builderl, global_env, []),
     process_config(Config).
 
 process_config([{Var, keep} | Config]) ->
