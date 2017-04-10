@@ -54,7 +54,8 @@ execute_steps([Step|Steps], Dir) ->
     Env = get_empty_env(),
     GlobalEnv = get_global_env(),
     NewEnv = merge_env(Env, GlobalEnv),
-    0 = builderl_process:run(Step, Dir, NewEnv),
+    CombinedEnv = merge_env(NewEnv, [{"HOME", Dir}]),
+    0 = builderl_process:run(Step, Dir, CombinedEnv),
     % {ok, _} = exec:run(Step, [{stdout, print}, {stderr, print}, {cd, Dir}, sync, EnvOpt]),
     execute_steps(Steps, Dir),
     ok;
