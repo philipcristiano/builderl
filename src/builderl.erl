@@ -51,7 +51,9 @@ execute_steps([Step|Steps], Dir) ->
     % EnvOpt = {env, [{"foo", "bar"},
     %                 {"APP_DIR", ""}]},
     Env = get_empty_env(),
-    0 = builderl_process:run(Step, Dir, Env),
+    GlobalEnv = get_global_env(),
+    NewEnv = merge_env(Env, GlobalEnv),
+    0 = builderl_process:run(Step, Dir, NewEnv),
     % {ok, _} = exec:run(Step, [{stdout, print}, {stderr, print}, {cd, Dir}, sync, EnvOpt]),
     execute_steps(Steps, Dir),
     ok;
@@ -73,4 +75,18 @@ empty_env([Envvar|T]) ->
     [Key, _Value] = re:split(Envvar, "=", [{parts, 2}]),
     [{binary:bin_to_list(Key), false} | empty_env(T)];
 empty_env([]) ->
+    [].
+
+merge_env(Env1, Env2) ->
+    orddict:merge(fun(_,_X,Y) -> Y end, orddict:from_list(Env1), orddict:from_list(Env2)).
+
+get_global_env() ->
+    Config = application:get_env(builder, global_env, []),
+    process_config(Config).
+
+process_config([{Var, keep} | Config]) ->
+    [{Var, os:getenv(Var)} | process_config(Config)];
+process_config([{Var, Val} | Config]) ->
+    [{Var, Val} | process_config(Config)];
+process_config([]) ->
     [].
