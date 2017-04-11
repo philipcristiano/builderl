@@ -1,5 +1,6 @@
 <transform dir path=usr -> drop>
 <transform dir path=lib -> drop>
 <transform dir path=opt$ -> drop>
+<transform dir path=etc$ -> drop>
 <transform file path=etc/builderl.config preserve=true>
 <transform file path=(var|lib)/svc/manifest/.*\.xml$ -> default restart_fmri svc:/system/manifest-import:default>
