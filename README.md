@@ -9,3 +9,15 @@ started.
 
 `make deps app shell` will start a server.
 
+## Configuration
+
+Configuration goes into the `local.config` file or (eventually) when deployed an `/etc/builderl.config` file.
+
+`global_env` - List of tuples specifying global environment settings. If `keep` is used as the value then the current environment variable will be carried over to the build.
+
+Example:
+
+```
+{global_env, [{"PATH", keep},
+              {"FOO", "BAR"}]}
+```
