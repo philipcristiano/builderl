@@ -16,10 +16,6 @@ DEP_PLUGINS = cowboy
 
 SHELL_OPTS = -eval 'application:ensure_all_started(builderl), sync:go().' -config sys
 
-# Building on OmniOS
-# CC=gcc CXX="/usr/bin/g++ -m64" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make app
-# with fast_yaml (not working yet CPATH=/opt/omni/lib CPPFLAGS="-I/opt/omni/include/amd64" CFLAGS="-I/opt/omni/include/amd64" LDFLAGS="-L/opt/omni/lib/amd64" CC=gcc CXX="/usr/bin/g++ -m64" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make deps app shell
-#
 # OmniOS build/packaging
 BUILDDIR = build
 BUILDTMP = tmp
