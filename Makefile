@@ -14,7 +14,7 @@ dep_yamerl = git https://github.com/yakaz/yamerl.git v0.4.0
 
 DEP_PLUGINS = cowboy
 
-SHELL_OPTS = -eval 'application:ensure_all_started(builderl), sync:go().' -config builderl
+SHELL_OPTS = -eval 'application:ensure_all_started(builderl), sync:go().' -config sys
 
 # Building on OmniOS
 # CC=gcc CXX="/usr/bin/g++ -m64" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make app
