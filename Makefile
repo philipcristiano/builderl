@@ -41,8 +41,12 @@ export IPS_METADATA
 
 package: rel
 	rm -rf ${BUILDDIR} ${BUILDTMP}
-	mkdir -p ${BUILDDIR}/opt/ ${BUILDTMP}
+	mkdir -p ${BUILDDIR}/opt/ ${BUILDTMP} "${BUILDDIR}/etc"
+
 	cp -R _rel/builderl_release ${BUILDDIR}/opt/builderl
+
+	# Config
+	cp omnios.config "${BUILDDIR}/etc/builderl.config"
 
 	# SMF
 	mkdir -p ${BUILDDIR}/lib/svc/manifest/application/
