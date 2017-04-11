@@ -36,6 +36,7 @@ set name=pkg.fmri value=${IPS_FMRI}
 set name=pkg.description value="${IPS_DESCRIPTION}"
 set name=pkg.summary value="${IPS_SUMMARAY}"
 set name=variant.arch value=${ARCH}
+depend type=require fmri=pkg:/developer/versioning/git
 endef
 export IPS_METADATA
 
