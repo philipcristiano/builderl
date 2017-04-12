@@ -67,7 +67,7 @@ checkout_ref(Path, Ref) ->
     git:checkout(Path, Ref).
 
 run() ->
-    build("git@github.com:philipcristiano/AWSMF-Data.git", [{ref, "package"}, {commit_ish, "package"}]).
+    build("https://github.com/philipcristiano/AWSMF-Data.git", [{ref, "package"}, {commit_ish, "package"}]).
 
 get_empty_env() ->
     Env = os:getenv(),
