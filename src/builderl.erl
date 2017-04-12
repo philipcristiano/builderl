@@ -23,11 +23,11 @@ build(GitRepo, Opts) ->
 
 clone_if_needed(false, GitRepo, Path) ->
     io:format("Clone ~n"),
-    git:clone(GitRepo, Path),
+    {ok, _Text} = git:clone(GitRepo, Path),
     ok;
 clone_if_needed(true, _GitRepo, Path) ->
     io:format("Fetch ~n"),
-    git:fetch(Path),
+    {ok, _Test} = git:fetch(Path),
     ok.
 
 build_project(CWD, BuilderlFile) ->
