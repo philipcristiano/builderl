@@ -9,7 +9,10 @@ run(Command, Dir, Env, {file, Path}) ->
     run(Command, Dir, Env, Output);
 run(Command, Dir, Env, Func) ->
     [Cmd|Args] = string:tokens(Command, " "),
-    Exec = os:find_executable(Cmd),
+    % Use the Env PATH to find the executable!
+    PATH = proplists:get_value("PATH", Env),
+    io:format("Finding command with PATH of ~p~n", [PATH]),
+    Exec = os:find_executable(Cmd, PATH),
     io:format("Command ~p~n", [Exec]),
     Port = erlang:open_port({spawn_executable, Exec},
         [stream, stderr_to_stdout, binary, exit_status,
