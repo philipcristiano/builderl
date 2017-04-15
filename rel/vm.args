@@ -1,4 +1,3 @@
 -sname builderl
 -setcookie builderl
 -heart
--start_epmd false

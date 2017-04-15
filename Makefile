@@ -50,6 +50,7 @@ package: rel
 	# SMF
 	mkdir -p ${BUILDDIR}/lib/svc/manifest/application/
 	cp smf.xml ${BUILDDIR}/lib/svc/manifest/application/builderl.xml
+	cp epmd.xml ${BUILDDIR}/lib/svc/manifest/application/epmd.xml
 
 	pkgsend generate build | pkgfmt > ${BUILDTMP}/pkg.pm5.1
 	cp LICENSE ${BUILDDIR}/

@@ -5,7 +5,6 @@
 --><service_bundle type="manifest" name="builderl">
 
     <service name="application/builderl" type="service" version="5">
-
         <create_default_instance enabled="false"/>
 
         <single_instance/>
@@ -17,6 +16,14 @@
         <dependency name="filesystem" grouping="require_all" restart_on="error" type="service">
             <service_fmri value="svc:/system/filesystem/local"/>
         </dependency>
+
+        <dependency
+            name='epmd'
+            grouping='require_all'
+            restart_on='none' type='service'>
+            <service_fmri value='svc:/network/epmd:default'/>
+        </dependency>
+
 
         <method_context>
             <method_environment>
