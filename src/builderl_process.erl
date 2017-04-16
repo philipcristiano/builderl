@@ -39,6 +39,7 @@ output_to_console({data, Data}) ->
     io:format("boop data ~p~n", [Data]).
 
 create_output_to_newfile(Path) ->
+    ok = filelib:ensure_dir(Path),
     {ok, IoD} = file:open(Path, [write]),
 
     Output = fun({data, {eol, Data}}) ->
