@@ -47,6 +47,6 @@ create_output_to_newfile(Path) ->
              ({data, {noeol, Data}}) ->
                 file:write(IoD, ["noeol", Data]);
              ({data, Data}) ->
-                file:write(IoD, ["data ", Data])
+                file:write(IoD, Data)
     end,
     Output.
