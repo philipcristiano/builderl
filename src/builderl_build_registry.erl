@@ -1,5 +1,6 @@
 -module(builderl_build_registry).
 -behaviour(gen_server).
+-compile({parse_transform, lager_transform}).
 
 %% API.
 -export([start_link/0]).
@@ -12,10 +13,13 @@
 -export([terminate/2]).
 -export([code_change/3]).
 
--export([create/3]).
+-export([create/3,
+         get_builds/1]).
 
 -record(state, {
 }).
+
+-define(TABLE, build_registry).
 
 %% API.
 
@@ -26,15 +30,39 @@ start_link() ->
 create(Project, Ref, Commitish) ->
     gen_server:call(?MODULE, {create, {Project, Ref, Commitish}}).
 
+get_builds(Project) when is_list(Project) ->
+    gen_server:call(?MODULE, {get_builds, Project}).
+
 %% gen_server.
 
 init([]) ->
+    FileBase = application:get_env(builderl, root, "tmp"),
+    Filename = filename:join([FileBase, "dets", "build_registry"]),
+    ok = lager:info("Build registry file ~p", [Filename]),
+    ok = filelib:ensure_dir(Filename),
+    {ok, _Name} = dets:open_file(?TABLE, [{type, bag},
+                                          {file, Filename}]),
 	{ok, #state{}}.
 
-handle_call({create, {_Project, _Ref, _Commitish}}, _From, State) ->
-	{reply, {ok, uuid:to_string(uuid:uuid4())}, State};
+handle_call({create, {Project, Ref, Commitish}}, _From, State) ->
+    ID = uuid:uuid4(),
+    SID = uuid:to_string(simple, ID),
+    lager:info("Generated ID ~p", [SID]),
+    Time = erlang:monotonic_time(seconds),
+    ok = dets:insert(?TABLE, {Project, ID, Ref, Commitish, Time}),
+    dets:sync(?TABLE),
+	{reply, {ok, SID}, State};
+handle_call({get_builds, Project}, _From, State) ->
+    Objects = dets:lookup(?TABLE, Project),
+    IDs = get_ids(Objects),
+	{reply, {ok, IDs}, State};
 handle_call(_Request, _From, State) ->
 	{reply, ignored, State}.
+
+get_ids([{_Project, ID, _Ref, _Commitish, _Time}|T]) ->
+    [uuid:to_string(simple, ID) | get_ids(T)];
+get_ids([]) ->
+    [].
 
 handle_cast(_Msg, State) ->
 	{noreply, State}.

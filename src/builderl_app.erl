@@ -6,8 +6,9 @@
 
 start(_Type, _Args) ->
     Dispatch = cowboy_router:compile([
-        {'_', [{"/webhooks/github", builderl_github_webhook, []}]}
-    ]),
+        {'_', [{"/webhooks/github", builderl_github_webhook, []},
+               {"/v0/builds/:org/:repo", builderl_builds_handler, []}]
+    }]),
     {ok, _} = cowboy:start_clear(my_http_listener, 10,
         [{port, 8080}],
         #{env => #{dispatch => Dispatch}}
