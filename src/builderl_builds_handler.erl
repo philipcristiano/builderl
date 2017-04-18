@@ -4,6 +4,8 @@
 
 -export([init/2]).
 
+-export([build_ids/1]).
+
 init(Req0=#{method := <<"GET">>}, State) ->
     Org = cowboy_req:binding(org, Req0),
     Repo = cowboy_req:binding(repo, Req0),
@@ -12,9 +14,11 @@ init(Req0=#{method := <<"GET">>}, State) ->
     {ok, BuildIDs} = builderl_build_registry:get_builds(Project),
     lager:info("builds ~p", [BuildIDs]),
 
-    Data = jsx:encode(#{builds => build_ids(BuildIDs)}),
+    % Data = jsx:encode(#{builds => build_ids(BuildIDs)}),
+    {ok, Data} = tmpl_builds_dtl:render([{builds, BuildIDs},
+                                         {project, Project}]),
     Reply = cowboy_req:reply(200,
-        #{<<"content-type">> => <<"text/plain">>},
+        #{<<"content-type">> => <<"text/html">>},
         Data,
         Req0),
     {ok, Reply, State}.
