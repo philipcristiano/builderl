@@ -14,6 +14,7 @@
 -export([code_change/3]).
 
 -export([create/3,
+         get_build/2,
          get_builds/1]).
 
 -record(state, {
@@ -32,6 +33,9 @@ create(Project, Ref, Commitish) ->
 
 get_builds(Project) when is_list(Project) ->
     gen_server:call(?MODULE, {get_builds, Project}).
+
+get_build(Project, ID) when is_list(ID)->
+    gen_server:call(?MODULE, {get_build, Project, ID}).
 
 %% gen_server.
 
@@ -56,6 +60,11 @@ handle_call({get_builds, Project}, _From, State) ->
     Objects = dets:lookup(?TABLE, Project),
     IDs = get_ids(Objects),
 	{reply, {ok, IDs}, State};
+handle_call({get_build, Project, ID}, _From, State) ->
+    BID = uuid:to_binary(ID),
+    io:format("ID ~p", [BID]),
+    Objects = dets:match(?TABLE, {Project, '_', '$1', '$2', '_'}),
+	{reply, {ok, Objects}, State};
 handle_call(_Request, _From, State) ->
 	{reply, ignored, State}.
 

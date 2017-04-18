@@ -1,4 +1,4 @@
--module(builderl_builds_handler).
+-module(builderl_build_handler).
 -behaviour(cowboy_handler).
 -compile({parse_transform, lager_transform}).
 
@@ -9,17 +9,14 @@ init(Req0=#{method := <<"GET">>}, State) ->
     Repo = cowboy_req:binding(repo, Req0),
     lager:info("Org/Repo ~p/~p", [Org, Repo]),
     Project = string:join([binary:bin_to_list(Org), binary:bin_to_list(Repo)], "/"),
-    {ok, BuildIDs} = builderl_build_registry:get_builds(Project),
-    lager:info("builds ~p", [BuildIDs]),
-
-    Data = jsx:encode(#{builds => build_ids(BuildIDs)}),
+    {ok, [BuildID| _]} = builderl_build_registry:get_builds(Project),
+    lager:info("build ~p", [BuildID]),
+    {ok, Objects} = builderl_build_registry:get_build(Project, BuildID),
+    {ok, Logs} = builderl:get_build_logs(Project, BuildID),
+    lager:info("Objects ~p", [Objects]),
+    _Data = jsx:encode(#{logs => Logs}),
     Reply = cowboy_req:reply(200,
         #{<<"content-type">> => <<"text/plain">>},
-        Data,
+        Logs,
         Req0),
     {ok, Reply, State}.
-
-build_ids([H|T]) ->
-    [binary:list_to_bin(H) | build_ids(T)];
-build_ids([]) ->
-    [].

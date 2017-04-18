@@ -21,8 +21,6 @@ run(Command, Dir, Env, Func) ->
     io:format("Status ~p~n",[Status]),
     Status.
 
-
-
 loop(Port, Fun) ->
     receive
         {Port, {exit_status, Status}} -> Status;
@@ -40,7 +38,7 @@ output_to_console({data, Data}) ->
 
 create_output_to_newfile(Path) ->
     ok = filelib:ensure_dir(Path),
-    {ok, IoD} = file:open(Path, [write]),
+    {ok, IoD} = file:open(Path, [append]),
 
     Output = fun({data, {eol, Data}}) ->
                 file:write(IoD, ["eol", Data, "\n"]);

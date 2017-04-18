@@ -1,6 +1,7 @@
 -module(builderl).
 
 -export([build/3,
+         get_build_logs/2,
          get_empty_env/0,
          get_global_env/0,
          run/0]).
@@ -75,15 +76,20 @@ execute_steps([Step|Steps], Dir, BR=#buildrecord{}) ->
 execute_steps([], _Dir, _BR) ->
     ok.
 
-filename_from_br(#buildrecord{id=BuildID, project=Name, step_count=Step, stage_count=Stage}) ->
+get_build_logs(Project, BuildID) ->
+    BR = #buildrecord{id=BuildID, project=Project},
+    {ok, Data} = read_build(BR),
+    {ok, Data}.
+
+read_build(BR) ->
+    Filename = filename_from_br(BR),
+    file:read_file(Filename).
+
+filename_from_br(#buildrecord{id=BuildID, project=Name}) ->
     lists:flatten(["/tmp/build-project-",
                    Name,
                    "/",
-                   BuildID,
-                   "-",
-                   erlang:integer_to_list(Stage),
-                   "-",
-                   erlang:integer_to_list(Step)]).
+                   BuildID]).
 
 checkout_ref(Path, Ref) ->
     git:checkout(Path, Ref).
