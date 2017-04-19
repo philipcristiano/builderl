@@ -1,6 +1,9 @@
-{% extend 'tmpl_base' %}
+{% extends 'tmpl_base.dtl' %}
+
+{% block body %}
 {% for build in builds %}
-  Foo
   <a href="/builds/{{ project }}/{{ build }}">{{build}}</a><br />
 
 {% endfor %}
+
+{% endblock %}
