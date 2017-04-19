@@ -1,0 +1,10 @@
+{% extends 'tmpl_base.dtl' %}
+
+{% block body %}
+{% for project in projects %}
+  <a href="/builds/{{ project }}">{{project}}</a><br />
+
+
+{% endfor %}
+
+{% endblock %}

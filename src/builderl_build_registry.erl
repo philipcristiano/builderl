@@ -15,7 +15,8 @@
 
 -export([create/3,
          get_build/2,
-         get_builds/1]).
+         get_builds/1,
+         get_projects/0]).
 
 -record(state, {
 }).
@@ -37,6 +38,9 @@ get_builds(Project) when is_list(Project) ->
 get_build(Project, ID) when is_list(ID)->
     gen_server:call(?MODULE, {get_build, Project, ID}).
 
+get_projects() ->
+    gen_server:call(?MODULE, get_projects).
+
 %% gen_server.
 
 init([]) ->
@@ -56,15 +60,22 @@ handle_call({create, {Project, Ref, Commitish}}, _From, State) ->
     ok = dets:insert(?TABLE, {Project, ID, Ref, Commitish, Time}),
     dets:sync(?TABLE),
 	{reply, {ok, SID}, State};
+
 handle_call({get_builds, Project}, _From, State) ->
     Objects = dets:lookup(?TABLE, Project),
     IDs = get_ids(Objects),
 	{reply, {ok, IDs}, State};
+
 handle_call({get_build, Project, ID}, _From, State) ->
     BID = uuid:to_binary(ID),
     io:format("ID ~p", [BID]),
     Objects = dets:match(?TABLE, {Project, '_', '$1', '$2', '_'}),
 	{reply, {ok, Objects}, State};
+
+handle_call(get_projects, _From, State) ->
+    Projects = keys(?TABLE),
+    {reply, {ok, Projects}, State};
+
 handle_call(_Request, _From, State) ->
 	{reply, ignored, State}.
 
@@ -72,6 +83,17 @@ get_ids([{_Project, ID, _Ref, _Commitish, _Time}|T]) ->
     [uuid:to_string(simple, ID) | get_ids(T)];
 get_ids([]) ->
     [].
+
+% Get keys of a table
+keys(TableName) ->
+    FirstKey = dets:first(TableName),
+        keys(TableName, FirstKey, [FirstKey]).
+
+keys(_TableName, '$end_of_table', ['$end_of_table'|Acc]) ->
+    Acc;
+keys(TableName, CurrentKey, Acc) ->
+    NextKey = dets:next(TableName, CurrentKey),
+    keys(TableName, NextKey, [NextKey|Acc]).
 
 handle_cast(_Msg, State) ->
 	{noreply, State}.
