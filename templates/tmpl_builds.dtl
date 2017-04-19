@@ -1,6 +1,6 @@
 {% extend 'tmpl_base' %}
 {% for build in builds %}
   Foo
-  <a href="/builds/{{ project }}/{{ build }}">{{build}}</a>
+  <a href="/builds/{{ project }}/{{ build }}">{{build}}</a><br />
 
 {% endfor %}
