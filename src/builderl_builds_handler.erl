@@ -11,11 +11,12 @@ init(Req0=#{method := <<"GET">>}, State) ->
     Repo = cowboy_req:binding(repo, Req0),
     lager:info("Org/Repo ~p/~p", [Org, Repo]),
     Project = string:join([binary:bin_to_list(Org), binary:bin_to_list(Repo)], "/"),
-    {ok, BuildIDs} = builderl_build_registry:get_builds(Project),
-    lager:info("builds ~p", [BuildIDs]),
+    {ok, Builds} = builderl_build_registry:get_builds(Project),
+    lager:info("builds ~p", [Builds]),
+    SortedBuilds = proplist_sort(time, Builds),
 
     % Data = jsx:encode(#{builds => build_ids(BuildIDs)}),
-    {ok, Data} = tmpl_builds_dtl:render([{builds, BuildIDs},
+    {ok, Data} = tmpl_builds_dtl:render([{builds, SortedBuilds},
                                          {project, Project}]),
     Reply = cowboy_req:reply(200,
         #{<<"content-type">> => <<"text/html">>},
@@ -27,3 +28,12 @@ build_ids([H|T]) ->
     [binary:list_to_bin(H) | build_ids(T)];
 build_ids([]) ->
     [].
+
+proplist_sort(Key, Lists) ->
+  Sortf = fun(A, B) ->
+    Av = proplists:get_value(Key, A),
+    Bv = proplists:get_value(Key, B),
+    Av =< Bv
+  end,
+  lists:sort(Sortf, Lists).
+

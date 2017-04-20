@@ -2,7 +2,7 @@
 
 {% block body %}
 {% for build in builds %}
-  <a href="/builds/{{ project }}/{{ build }}">{{build}}</a><br />
+  <a href="/builds/{{ project }}/{{ build.id }}">{{build.ref}} - {{build.commitish}} {{build.id}} {{build.time}}</a><br />
 
 {% endfor %}
 

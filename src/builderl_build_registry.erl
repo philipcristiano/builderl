@@ -63,8 +63,8 @@ handle_call({create, {Project, Ref, Commitish}}, _From, State) ->
 
 handle_call({get_builds, Project}, _From, State) ->
     Objects = dets:lookup(?TABLE, Project),
-    IDs = get_ids(Objects),
-	{reply, {ok, IDs}, State};
+    Builds = builds_to_proplist(Objects),
+	{reply, {ok, Builds}, State};
 
 handle_call({get_build, Project, ID}, _From, State) ->
     BID = uuid:to_binary(ID),
@@ -79,9 +79,13 @@ handle_call(get_projects, _From, State) ->
 handle_call(_Request, _From, State) ->
 	{reply, ignored, State}.
 
-get_ids([{_Project, ID, _Ref, _Commitish, _Time}|T]) ->
-    [uuid:to_string(simple, ID) | get_ids(T)];
-get_ids([]) ->
+builds_to_proplist([{Project, ID, Ref, Commitish, Time}|T]) ->
+    [[{id, uuid:to_string(simple, ID)},
+     {project, Project},
+     {ref, Ref},
+     {commitish, Commitish},
+     {time, Time}]| builds_to_proplist(T)];
+builds_to_proplist([]) ->
     [].
 
 % Get keys of a table
