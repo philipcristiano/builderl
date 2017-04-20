@@ -1,9 +1,13 @@
 {% extends 'tmpl_base.dtl' %}
+{% load builderl_dtl_filters %}
+
 
 {% block body %}
+pre-{{ "foo" | sToDatetime }}-post
 {% for build in builds %}
-  <a href="/builds/{{ project }}/{{ build.id }}">{{build.ref}} - {{build.commitish}} {{build.id}} {{build.time}}</a><br />
-
+  pre{% filter sToDatetime %} blah {% endfilter %}post
+  <a href="/builds/{{ project }}/{{ build.id }}">{{build.ref}} - {{build.commitish}} {{build.id}} {{build.time}} </a>pre{{ build.time | sToDatetime }}post <br />
 {% endfor %}
+pre-{{ "foo" | sToDatetime }}-post
 
 {% endblock %}

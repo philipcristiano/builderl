@@ -12,7 +12,7 @@ init(Req0=#{method := <<"GET">>}, State) ->
     lager:info("Org/Repo ~p/~p", [Org, Repo]),
     Project = string:join([binary:bin_to_list(Org), binary:bin_to_list(Repo)], "/"),
     {ok, Builds} = builderl_build_registry:get_builds(Project),
-    lager:info("builds ~p", [Builds]),
+    % lager:debug("builds ~p", [Builds]),
     SortedBuilds = proplist_sort(time, Builds),
 
     % Data = jsx:encode(#{builds => build_ids(BuildIDs)}),
@@ -37,3 +37,8 @@ proplist_sort(Key, Lists) ->
   end,
   lists:sort(Sortf, Lists).
 
+% sToDate(Seconds) ->
+%    BaseDate      = calendar:datetime_to_gregorian_seconds({{1970,1,1},{0,0,0}}),
+%    Seconds       = BaseDate + Seconds,
+%    { Date,_Time} = calendar:gregorian_seconds_to_datetime(Seconds),
+%    Date.
