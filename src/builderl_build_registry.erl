@@ -56,7 +56,7 @@ handle_call({create, {Project, Ref, Commitish}}, _From, State) ->
     ID = uuid:uuid4(),
     SID = uuid:to_string(simple, ID),
     lager:info("Generated ID ~p", [SID]),
-    Time = erlang:monotonic_time(seconds),
+    Time = os:system_time(seconds),
     ok = dets:insert(?TABLE, {Project, ID, Ref, Commitish, Time}),
     dets:sync(?TABLE),
 	{reply, {ok, SID}, State};
