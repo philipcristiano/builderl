@@ -7,9 +7,9 @@
 init(Req0=#{method := <<"GET">>}, State) ->
     Org = cowboy_req:binding(org, Req0),
     Repo = cowboy_req:binding(repo, Req0),
+    BuildID = binary:bin_to_list(cowboy_req:binding(build, Req0)),
     lager:info("Org/Repo ~p/~p", [Org, Repo]),
     Project = string:join([binary:bin_to_list(Org), binary:bin_to_list(Repo)], "/"),
-    {ok, [BuildID| _]} = builderl_build_registry:get_builds(Project),
     lager:info("build ~p", [BuildID]),
     {ok, Objects} = builderl_build_registry:get_build(Project, BuildID),
     {ok, Logs} = builderl:get_build_logs(Project, BuildID),
