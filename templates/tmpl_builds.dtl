@@ -3,11 +3,8 @@
 
 
 {% block body %}
-pre-{{ "foo" | sToDatetime }}-post
 {% for build in builds %}
-  pre{% filter sToDatetime %} blah {% endfilter %}post
-  <a href="/builds/{{ project }}/{{ build.id }}">{{build.ref}} - {{build.commitish}} {{build.id}} {{build.time}} </a>pre{{ build.time | sToDatetime }}post <br />
+  <a href="/builds/{{ project }}/{{ build.id }}">{{build.ref}} - {{build.commitish}} {{build.id}} {{build.time}} </a><span>{{ build.time | sToDatetime }}</span><br />
 {% endfor %}
-pre-{{ "foo" | sToDatetime }}-post
 
 {% endblock %}

@@ -18,6 +18,7 @@ dep_erlydtl = git https://github.com/erlydtl/erlydtl.git 0.12.1
 DEP_PLUGINS = cowboy
 
 SHELL_OPTS = -eval 'application:ensure_all_started(builderl), sync:go().' -config sys
+DTL_OPTS = force_recompile, {libraries, [{builderl_filters, builderl_dtl_filters}]}, {default_libraries, [builderl_filters]}
 
 # OmniOS build/packaging
 BUILDDIR = build
