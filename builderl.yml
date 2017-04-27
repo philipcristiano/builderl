@@ -9,10 +9,7 @@ stages:
       - env
       - pwd
 
-      # Need to `make` twice to deal with build ordering in templates https://github.com/ninenines/erlang.mk/issues/457
       - make -j 4 app
-      - touch templates/*
-      - make app
 
       - make package
       - make publish
