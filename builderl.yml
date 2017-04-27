@@ -9,7 +9,7 @@ stages:
       - env
       - pwd
 
-      - make -j 4 app
+      - make -j 4 deps app
 
       - make package
       - make publish
