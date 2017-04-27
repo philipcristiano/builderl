@@ -17,7 +17,6 @@ inventory(tags) ->
 
 
 sToDatetime(Seconds) when is_integer(Seconds)->
-    io:format("huh? ~p~n", [Seconds]),
     {Date, Time} = secondsToDateAndTime(Seconds),
     formatDate(Date, Time);
 sToDatetime(Seconds) ->
