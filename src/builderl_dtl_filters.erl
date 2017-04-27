@@ -11,10 +11,8 @@ version() ->
   1.
 
 inventory(filters) ->
-  io:format("\n\nFiltering\n\n"),
   [sToDatetime];
 inventory(tags) ->
-  io:format("\nTagging\n"),
   [].
 
 
