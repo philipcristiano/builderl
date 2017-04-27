@@ -33,7 +33,7 @@ proplist_sort(Key, Lists) ->
   Sortf = fun(A, B) ->
     Av = proplists:get_value(Key, A),
     Bv = proplists:get_value(Key, B),
-    Av =< Bv
+    Av >= Bv
   end,
   lists:sort(Sortf, Lists).
 
