@@ -66,9 +66,11 @@ execute_steps([Step|Steps], Dir, BR=#buildrecord{}) ->
     Env = get_empty_env(),
     GlobalEnv = get_global_env(),
     NewEnv = merge_env(Env, GlobalEnv),
+    BREnv = get_env_from_br(BR),
     CombinedEnv = merge_env(NewEnv, [{"HOME", Dir}]),
+    LastEnv = merge_env(CombinedEnv, BREnv),
     Filename = filename_from_br(BR),
-    0 = builderl_process:run(Step, Dir, CombinedEnv, {file, Filename}),
+    0 = builderl_process:run(Step, Dir, LastEnv, {file, Filename}),
     % {ok, _} = exec:run(Step, [{stdout, print}, {stderr, print}, {cd, Dir}, sync, EnvOpt]),
 
     execute_steps(Steps, Dir, BR#buildrecord{step_count=BR#buildrecord.step_count + 1}),
@@ -108,6 +110,12 @@ empty_env([Envvar|T]) ->
     [{binary:bin_to_list(Key), false} | empty_env(T)];
 empty_env([]) ->
     [].
+
+get_env_from_br(#buildrecord{id=BuildId, project=Name, committish=C, ref=Ref}) ->
+    [{"BUILDERL_BUILD_ID", BuildId},
+     {"BUILDERL_PROJECT", Name},
+     {"BUILDERL_COMMITTISH", C},
+     {"BUILDERL_REF", Ref}].
 
 merge_env(Env1, Env2) ->
     orddict:merge(fun(_,_X,Y) -> Y end, orddict:from_list(Env1), orddict:from_list(Env2)).

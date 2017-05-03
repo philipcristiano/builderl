@@ -11,7 +11,7 @@ init(Req0=#{method := <<"POST">>}, State) ->
     FullName = maps:get(<<"full_name">>, Repo),
     Url = maps:get(<<"url">>, Repo),
     Ref = maps:get(<<"ref">>, Data),
-    CommitIsh = maps:get(<<"after">>, Data),
+    CommitIsh = binary:bin_to_list(maps:get(<<"after">>, Data)),
 
     Req2 = cowboy_req:reply(200,
         #{<<"content-type">> => <<"text/plain">>},
