@@ -21,14 +21,15 @@ init(Req0=#{method := <<"POST">>}, State) ->
     io:format("Member ~p~n", [FullName]),
     NameL = binary:bin_to_list(FullName),
     IsMember = lists:member(FullName, [<<"philipcristiano/builderl">>]),
-    trigger_build(IsMember, NameL, Url, CommitIsh),
+    trigger_build(IsMember, NameL, Url, CommitIsh, Ref),
 
     {ok, Req2, State}.
 
 
-trigger_build(true, FullName, Url, CommitIsh) ->
+trigger_build(true, FullName, Url, CommitIsh, Ref) ->
     io:format("Building~n"),
-    builderl:build(FullName, Url, [{commit_ish, CommitIsh}]);
-trigger_build(false, _FullName, _Url, _CommitIsh) ->
+    builderl:build(FullName, Url, [{commit_ish, CommitIsh},
+                                   {ref, Ref}]);
+trigger_build(false, _FullName, _Url, _CommitIsh, _Ref) ->
     io:format("Not a whitelisted project~n"),
     ok.
