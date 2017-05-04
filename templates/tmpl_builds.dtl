@@ -4,7 +4,8 @@
 
 {% block body %}
 {% for build in builds %}
-  <a href="/builds/{{ project }}/{{ build.id }}">{{ build.ref }} - {{build.commitish}} {{build.id}}  </a> - <span>{{ build.time | sToDatetime }}</span><br />
+  <span>{{ build.time | sToDatetime }}</span> - {{ build.ref }} -
+  <a href="/builds/{{ project }}/{{ build.id }}">{{build.commitish}} {{build.id}}  </a> - <br />
 {% endfor %}
 
 {% endblock %}
