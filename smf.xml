@@ -21,7 +21,7 @@
             name='epmd'
             grouping='require_all'
             restart_on='none' type='service'>
-            <service_fmri value='svc:/network/epmd:default'/>
+            <service_fmri value='svc:/application/epmd:default'/>
         </dependency>
 
 

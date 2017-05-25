@@ -4,7 +4,7 @@
 Copied form project-fifo empd script and modified to fit builderl
 -->
 <service_bundle type='manifest' name='export'>
-  <service name='network/epmd' type='service' version='0'>
+  <service name='application/epmd' type='service' version='0'>
     <create_default_instance enabled='true'/>
     <single_instance/>
     <dependency name='network' grouping='require_all' restart_on='error' type='service'>
