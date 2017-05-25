@@ -20,8 +20,9 @@ init(Req0=#{method := <<"POST">>}, State) ->
 
     io:format("Member ~p~n", [FullName]),
     NameL = binary:bin_to_list(FullName),
+    LRef = binary:bin_to_list(Ref),
     IsMember = lists:member(FullName, [<<"philipcristiano/builderl">>]),
-    trigger_build(IsMember, NameL, Url, CommitIsh, Ref),
+    trigger_build(IsMember, NameL, Url, CommitIsh, LRef),
 
     {ok, Req2, State}.
 
