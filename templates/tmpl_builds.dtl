@@ -2,6 +2,8 @@
 {% load builderl_dtl_filters %}
 
 
+{% block title %}{{ project }} at Buildlerl {% endblock %}
+
 {% block body %}
 {% for build in builds %}
   <span>{{ build.time | sToDatetime }}</span> - {{ build.ref }} -
