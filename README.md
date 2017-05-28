@@ -81,3 +81,21 @@ stages:
 ```
 
 This will `./configure` and `make` for all builds, but only `make package` when on the master branch.
+
+
+## Environment
+
+An environment map can be specified with the `environment` attribute
+
+```
+environment:
+    FOO: BAR
+
+stages:
+    - name: Echo ENV
+      steps:
+        - env
+```
+
+Shell expansion will not happen so using $VAR directly will not work. If you
+need the environment variable then a script can be used.

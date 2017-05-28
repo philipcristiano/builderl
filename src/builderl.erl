@@ -49,10 +49,12 @@ build_project(CWD, BuilderlFile, BR=#buildrecord{}) ->
     [BuildConfig] = yamerl_constr:file(BuilderlFile),
     io:format("File ~p~n", [BuildConfig]),
     Stages = proplists:get_value("stages", BuildConfig),
-    execute_stages(Stages, CWD, BR),
+    BuildFileEnv = proplists:get_value("environment", BuildConfig, []),
+    io:format("FileEnv ~p~n", [BuildFileEnv]),
+    execute_stages(Stages, CWD, BR, BuildFileEnv),
     ok.
 
-execute_stages([Stage|Stages], Dir, BR=#buildrecord{ref=Ref}) ->
+execute_stages([Stage|Stages], Dir, BR=#buildrecord{ref=Ref}, BuildFileEnv) ->
     {_RefType, ShortRef} = short_ref(Ref),
 
     Steps = proplists:get_value("steps", Stage),
@@ -62,11 +64,14 @@ execute_stages([Stage|Stages], Dir, BR=#buildrecord{ref=Ref}) ->
         nomatch -> ok;
         {error, _ErrorType} -> ok;
         % match or {match, captured} run these steps
-        _ -> execute_steps(Steps, Dir, BR#buildrecord{step_count=0})
+        _ -> execute_steps(Steps, Dir, BR#buildrecord{step_count=0}, BuildFileEnv)
     end,
-    execute_stages(Stages, Dir, BR#buildrecord{stage_count=BR#buildrecord.stage_count + 1}),
+    execute_stages(Stages,
+                   Dir,
+                   BR#buildrecord{stage_count=BR#buildrecord.stage_count + 1},
+                   BuildFileEnv),
     ok;
-execute_stages([], _Dir, _Count) ->
+execute_stages([], _Dir, _BR, _BuildFileEnv) ->
     ok.
 
 
@@ -79,21 +84,29 @@ short_ref(<<"tags">>, ShortRef) ->
 short_ref(<<"heads">>, ShortRef) ->
     {branch, ShortRef}.
 
-execute_steps([Step|Steps], Dir, BR=#buildrecord{}) ->
+execute_steps([Step|Steps], Dir, BR=#buildrecord{}, BuildFileEnv) ->
     io:format("Step: ~p in ~p~n", [Step, Dir]),
+
     Env = get_empty_env(),
     GlobalEnv = get_global_env(),
-    NewEnv = merge_env(Env, GlobalEnv),
     BREnv = get_env_from_br(BR),
-    CombinedEnv = merge_env(NewEnv, [{"HOME", Dir}]),
-    LastEnv = merge_env(CombinedEnv, BREnv),
+    NeededEnv = [{"HOME", Dir}],
+
+    Env1 = merge_env(Env, GlobalEnv),
+    Env2 = merge_env(Env1, BREnv),
+    Env3 = merge_env(Env2, NeededEnv),
+    Env4 = merge_env(Env3, BuildFileEnv),
+
     Filename = filename_from_br(BR),
-    0 = builderl_process:run(Step, Dir, LastEnv, {file, Filename}),
+    0 = builderl_process:run(Step, Dir, Env4, {file, Filename}),
     % {ok, _} = exec:run(Step, [{stdout, print}, {stderr, print}, {cd, Dir}, sync, EnvOpt]),
 
-    execute_steps(Steps, Dir, BR#buildrecord{step_count=BR#buildrecord.step_count + 1}),
+    execute_steps(Steps,
+                  Dir,
+                  BR#buildrecord{step_count=BR#buildrecord.step_count + 1},
+                  BuildFileEnv),
     ok;
-execute_steps([], _Dir, _BR) ->
+execute_steps([], _Dir, _BR, _BuildFileEnv) ->
     ok.
 
 get_build_logs(Project, BuildID) ->

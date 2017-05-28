@@ -1,11 +1,10 @@
 environment:
-  CC: gcc
-  CXX: "/usr/bin/g++ -m64"
-  PATH: /usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH
+    FOO: BAR
 
 stages:
   - name: build
     steps:
+      - env
       - pwd
       - make deps app
 
