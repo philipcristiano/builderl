@@ -47,3 +47,37 @@ Example:
 {global_env, [{"PATH", keep},
               {"FOO", "BAR"}]}
 ```
+
+## Build Files
+
+Builderl loads the `builderl.yml` file in the root of the project.
+
+Builds are composed of stages and steps. Stages have a name, optionally a regex matcher for the branch/tag whether to build, and a steps to execute.
+
+A minimal example:
+
+```
+stages:
+  - name: Hello World
+    steps:
+      - echo 'Hello World'
+```
+
+This build contains a single stage with a single step, `echo 'Hello World'`.
+
+If the stage attribute `match` is specified then Builderl will run the `match` as a regex against the branch or tag name of the build.
+
+```
+stages:
+  - name: Build
+    steps:
+      - ./configure
+      - make
+
+  - name: Package
+    match: '^master$'
+    steps:
+      - make package
+```
+
+This will `./configure` and `make` for all builds, but only `make package` when on the master branch.

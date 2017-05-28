@@ -4,12 +4,13 @@ environment:
   PATH: /usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH
 
 stages:
-  - name: package
+  - name: build
     steps:
-      - env
       - pwd
-
       - make deps app
 
+  - name: package
+    match: "^master$"
+    steps:
       - make package
       - make publish

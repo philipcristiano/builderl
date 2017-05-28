@@ -52,14 +52,32 @@ build_project(CWD, BuilderlFile, BR=#buildrecord{}) ->
     execute_stages(Stages, CWD, BR),
     ok.
 
-execute_stages([Stage|Stages], Dir, BR=#buildrecord{}) ->
+execute_stages([Stage|Stages], Dir, BR=#buildrecord{ref=Ref}) ->
+    {_RefType, ShortRef} = short_ref(Ref),
+
     Steps = proplists:get_value("steps", Stage),
-    execute_steps(Steps, Dir, BR#buildrecord{step_count=0}),
+    RefMatcher = proplists:get_value("match", Stage, ".*"),
+    case re:run(ShortRef, RefMatcher) of
+        % No match or error, don't need to run anything
+        nomatch -> ok;
+        {error, _ErrorType} -> ok;
+        % match or {match, captured} run these steps
+        _ -> execute_steps(Steps, Dir, BR#buildrecord{step_count=0})
+    end,
     execute_stages(Stages, Dir, BR#buildrecord{stage_count=BR#buildrecord.stage_count + 1}),
     ok;
 execute_stages([], _Dir, _Count) ->
     ok.
 
+
+short_ref(Ref) ->
+    [<<"refs">>, B, Rest] = re:split(Ref, "/", [{parts , 3}]),
+    short_ref(B, Rest).
+
+short_ref(<<"tags">>, ShortRef) ->
+    {tag, ShortRef};
+short_ref(<<"heads">>, ShortRef) ->
+    {branch, ShortRef}.
 
 execute_steps([Step|Steps], Dir, BR=#buildrecord{}) ->
     io:format("Step: ~p in ~p~n", [Step, Dir]),
