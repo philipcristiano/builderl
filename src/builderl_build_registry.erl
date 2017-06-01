@@ -1,6 +1,7 @@
 -module(builderl_build_registry).
 -behaviour(gen_server).
 -compile({parse_transform, lager_transform}).
+-include_lib("stdlib/include/ms_transform.hrl").
 
 %% API.
 -export([start_link/0]).
@@ -22,6 +23,7 @@
 }).
 
 -define(TABLE, build_registry).
+-record(builderl_build_record, {id, project, ref, committish, state, time}).
 
 %% API.
 
@@ -57,34 +59,52 @@ handle_call({create, {Project, Ref, Commitish}}, _From, State) ->
     SID = uuid:to_string(simple, ID),
     lager:info("Generated ID ~p", [SID]),
     Time = os:system_time(seconds),
-    ok = dets:insert(?TABLE, {Project, ID, Ref, Commitish, Time}),
+    Record = #builderl_build_record{id=ID,
+                                    project=Project,
+                                    ref=Ref,
+                                    committish=Commitish,
+                                    state=created,
+                                    time=Time},
+    ok = dets:insert(?TABLE, Record),
     dets:sync(?TABLE),
-	{reply, {ok, SID}, State};
+	  {reply, {ok, SID}, State};
 
 handle_call({get_builds, Project}, _From, State) ->
-    Objects = dets:lookup(?TABLE, Project),
+    Match = ets:fun2ms(
+            fun(BBR=#builderl_build_record{project=BBRProject}) when BBRProject =:= Project ->
+                BBR
+            end),
+
+    Objects = dets:select(?TABLE, Match),
     Builds = builds_to_proplist(Objects),
-	{reply, {ok, Builds}, State};
+	  {reply, {ok, Builds}, State};
 
 handle_call({get_build, Project, ID}, _From, State) ->
     BID = uuid:to_binary(ID),
     io:format("ID ~p", [BID]),
-    Objects = dets:match(?TABLE, {Project, '_', '$1', '$2', '_'}),
-	{reply, {ok, Objects}, State};
+    Objects = dets:lookup(?TABLE, ID),
+	  {reply, {ok, Objects}, State};
 
 handle_call(get_projects, _From, State) ->
     Projects = keys(?TABLE),
     {reply, {ok, Projects}, State};
 
 handle_call(_Request, _From, State) ->
-	{reply, ignored, State}.
+	  {reply, ignored, State}.
 
-builds_to_proplist([{Project, ID, Ref, Commitish, Time}|T]) ->
+builds_to_proplist([{Project, ID, Ref, Commitish, Time}|Rest]) ->
     [[{id, uuid:to_string(simple, ID)},
      {project, Project},
      {ref, Ref},
      {commitish, Commitish},
-     {time, Time}]| builds_to_proplist(T)];
+     {time, Time}]| builds_to_proplist(Rest)];
+builds_to_proplist([#builderl_build_record{project=P, id=ID, ref=R, committish=C, time=T}|Rest]) ->
+    [[{id, uuid:to_string(simple, ID)},
+     {project, P},
+     {ref, R},
+     {commitish, C},
+     {time, T}]| builds_to_proplist(Rest)];
+
 builds_to_proplist([]) ->
     [].
 
