@@ -47,10 +47,10 @@ get_projects() ->
 
 init([]) ->
     FileBase = application:get_env(builderl, root, "tmp"),
-    Filename = filename:join([FileBase, "dets", "build_registry"]),
+    Filename = filename:join([FileBase, "dets", "build_registry_set"]),
     ok = lager:info("Build registry file ~p", [Filename]),
     ok = filelib:ensure_dir(Filename),
-    {ok, _Name} = dets:open_file(?TABLE, [{type, bag},
+    {ok, _Name} = dets:open_file(?TABLE, [{type, set},
                                           {file, Filename}]),
 	{ok, #state{}}.
 
@@ -79,7 +79,7 @@ handle_call({get_builds, Project}, _From, State) ->
     Builds = builds_to_proplist(Objects),
 	  {reply, {ok, Builds}, State};
 
-handle_call({get_build, Project, ID}, _From, State) ->
+handle_call({get_build, _Project, ID}, _From, State) ->
     BID = uuid:to_binary(ID),
     io:format("ID ~p", [BID]),
     Objects = dets:lookup(?TABLE, ID),
