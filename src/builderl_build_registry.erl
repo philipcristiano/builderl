@@ -29,7 +29,7 @@
 
 -spec start_link() -> {ok, pid()}.
 start_link() ->
-	gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+	  gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 create(Project, Ref, Commitish) ->
     gen_server:call(?MODULE, {create, {Project, Ref, Commitish}}).
