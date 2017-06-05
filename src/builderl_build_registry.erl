@@ -55,6 +55,7 @@ init([]) ->
     ok = lager:info("Build registry file ~p", [Filename]),
     ok = filelib:ensure_dir(Filename),
     {ok, _Name} = dets:open_file(?TABLE, [{type, set},
+                                          {keypos, #builderl_build_record.id},
                                           {file, Filename}]),
 	{ok, #state{}}.
 
