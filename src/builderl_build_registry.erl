@@ -17,7 +17,8 @@
 -export([create/3,
          get_build/2,
          get_builds/1,
-         get_projects/0]).
+         get_projects/0,
+         set_build_state/2]).
 
 -record(state, {
 }).
@@ -42,6 +43,9 @@ get_build(Project, ID) when is_list(ID)->
 
 get_projects() ->
     gen_server:call(?MODULE, get_projects).
+
+set_build_state(ID, State) ->
+    gen_server:call(?MODULE, {set_build_state, ID, State}).
 
 %% gen_server.
 
@@ -89,6 +93,15 @@ handle_call(get_projects, _From, State) ->
     Projects = keys(?TABLE),
     {reply, {ok, Projects}, State};
 
+handle_call({set_build_state, ID, BRState}, _From, State) ->
+    BID = uuid:to_binary(ID),
+    io:format("ID ~p~n", [BID]),
+    [BR0] = dets:lookup(?TABLE, BID),
+    io:format("Item ~p~n", [BR0]),
+    BR1 = BR0#builderl_build_record{state=BRState},
+    dets:insert(?TABLE, BR1),
+    {reply, ok, State};
+
 handle_call(_Request, _From, State) ->
 	  {reply, ignored, State}.
 
@@ -98,11 +111,13 @@ builds_to_proplist([{Project, ID, Ref, Commitish, Time}|Rest]) ->
      {ref, Ref},
      {commitish, Commitish},
      {time, Time}]| builds_to_proplist(Rest)];
-builds_to_proplist([#builderl_build_record{project=P, id=ID, ref=R, committish=C, time=T}|Rest]) ->
+builds_to_proplist([#builderl_build_record{project=P, id=ID, ref=R, committish=C, time=T, state=S}|Rest]) ->
+    lager:info("State ~p", [S]),
     [[{id, uuid:to_string(simple, ID)},
      {project, P},
      {ref, R},
      {commitish, C},
+     {state, S},
      {time, T}]| builds_to_proplist(Rest)];
 
 builds_to_proplist([]) ->

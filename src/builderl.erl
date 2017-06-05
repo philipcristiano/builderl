@@ -71,7 +71,8 @@ execute_stages([Stage|Stages], Dir, BR=#buildrecord{ref=Ref}, BuildFileEnv) ->
                    BR#buildrecord{stage_count=BR#buildrecord.stage_count + 1},
                    BuildFileEnv),
     ok;
-execute_stages([], _Dir, _BR, _BuildFileEnv) ->
+execute_stages([], _Dir, #buildrecord{id=ID}, _BuildFileEnv) ->
+    builderl_build_registry:set_build_state(ID, successful),
     ok.
 
 
