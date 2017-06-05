@@ -86,8 +86,8 @@ handle_call({get_builds, Project}, _From, State) ->
 
 handle_call({get_build, _Project, ID}, _From, State) ->
     BID = uuid:to_binary(ID),
-    io:format("ID ~p", [BID]),
-    Objects = dets:lookup(?TABLE, ID),
+    io:format("ID ~p~n", [{BID, ID}]),
+    [Objects] = dets:lookup(?TABLE, BID),
 	  {reply, {ok, Objects}, State};
 
 handle_call(get_projects, _From, State) ->
