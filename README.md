@@ -46,6 +46,12 @@ Example:
 ```
 {global_env, [{"PATH", keep},
               {"FOO", "BAR"}]}
+
+The HTTP port used by the web server can be changed with `port` (default 8080).
+
+```
+[{builderl, [
+  {http_port, 8080}]}].
 ```
 
 ## Build Files
