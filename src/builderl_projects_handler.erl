@@ -2,10 +2,15 @@
 -behaviour(cowboy_handler).
 -compile({parse_transform, lager_transform}).
 
--export([init/2]).
+-export([init/2,
+         state_init/0]).
+
+state_init() ->
+    Projects = builderl:get_projects(),
+    [{projects, Projects}].
 
 init(Req0=#{method := <<"GET">>}, State) ->
-    {ok, Projects} = builderl_build_registry:get_projects(),
+    Projects = proplists:get_value(projects, State),
     lager:info("projects ~p", [Projects]),
 
     {ok, Data} = tmpl_projects_dtl:render([{projects, Projects}]),

@@ -7,8 +7,8 @@
 
 start(_Type, _Args) ->
     Dispatch = cowboy_router:compile([
-        {'_', [{"/webhooks/github", builderl_github_webhook, []},
-               {"/projects", builderl_projects_handler, []},
+        {'_', [{"/webhooks/github", builderl_github_webhook, builderl_github_webhook:state_init()},
+               {"/projects", builderl_projects_handler, builderl_projects_handler:state_init()},
                {"/builds/:org/:repo", builderl_builds_handler, []},
                {"/builds/:org/:repo/:build", builderl_build_handler, []}]
     }]),

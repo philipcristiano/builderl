@@ -4,6 +4,7 @@
          get_build_logs/2,
          get_empty_env/0,
          get_global_env/0,
+         get_projects/0,
          run/0]).
 
 -record(buildrecord, {id=undefined,
@@ -12,6 +13,11 @@
                       committish=undefined,
                       ref=undefined,
                       step_count=0}).
+
+get_projects() ->
+    Projects = application:get_env(builderl, projects, []),
+    BinProjects = [ binary:list_to_bin(P) || P <- Projects ],
+    BinProjects.
 
 build(Name, GitRepo, Opts) ->
     Time = erlang:monotonic_time(seconds),

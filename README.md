@@ -54,6 +54,11 @@ The HTTP port used by the web server can be changed with `port` (default 8080).
   {http_port, 8080}]}].
 ```
 
+`projects` - A list of Github Org/Repo strings for whitelisted projects to build.
+
+```
+[{projects, ["philipcristiano/builderl"]}].
+
 ## Build Files
 
 Builderl loads the `builderl.yml` file in the root of the project.

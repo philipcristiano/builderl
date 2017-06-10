@@ -1,10 +1,18 @@
 -module(builderl_github_webhook).
 -behavior(cowboy_handler).
+-compile({parse_transform, lager_transform}).
 
--export([init/2]).
+-export([init/2,
+         state_init/0]).
+
+state_init() ->
+    Projects = builderl:get_projects(),
+    lager:info("Whitelisted projects ~p", [Projects]),
+    [{projects, Projects}].
 
 init(Req0=#{method := <<"POST">>}, State) ->
     {ok, Body, Req1} = cowboy_req:read_body(Req0),
+    Projects = proplists:get_value(projects, State),
     Data = jsx:decode(Body, [return_maps]),
 
     Repo = maps:get(<<"repository">>, Data, #{}),
@@ -21,11 +29,10 @@ init(Req0=#{method := <<"POST">>}, State) ->
     io:format("Member ~p~n", [FullName]),
     NameL = binary:bin_to_list(FullName),
     LRef = binary:bin_to_list(Ref),
-    IsMember = lists:member(FullName, [<<"philipcristiano/builderl">>]),
+    IsMember = lists:member(FullName, Projects),
     trigger_build(IsMember, NameL, Url, CommitIsh, LRef),
 
     {ok, Req2, State}.
-
 
 trigger_build(true, FullName, Url, CommitIsh, Ref) ->
     io:format("Building~n"),
