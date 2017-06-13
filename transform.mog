@@ -4,3 +4,5 @@
 <transform dir path=etc$ -> drop>
 <transform file path=etc/builderl.config -> add preserve true>
 <transform file path=(var|lib)/svc/manifest/.*\.xml$ -> default restart_fmri svc:/system/manifest-import:default>
+<transform file dir -> set owner builderl>
+<transform file dir -> set group builderl>
