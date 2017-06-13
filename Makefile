@@ -38,6 +38,8 @@ set name=pkg.summary value="${IPS_SUMMARAY}"
 set name=variant.arch value=${ARCH}
 depend type=require fmri=pkg:/developer/versioning/git
 depend type=require fmri=pkg:/developer/build/gnu-make
+group groupname=builderl
+user username=builderl group=builderl home-dir=/opt/builderl
 endef
 export IPS_METADATA
 

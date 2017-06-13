@@ -110,3 +110,15 @@ stages:
 
 Shell expansion will not happen so using $VAR directly will not work. If you
 need the environment variable then a script can be used.
+
+## Installation
+
+Once the package is in your repository
+
+`pkg install builderl`
+
+Add a configuration file (see above) to `/etc/builderl.config`
+
+Enable the service
+
+`svcadm enable builderl`
