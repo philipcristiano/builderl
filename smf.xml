@@ -4,7 +4,7 @@
         Created by Manifold
 --><service_bundle type="manifest" name="builderl">
 
-    <service name="application/builderl" type="service" version="5">
+    <service name="application/builderl" type="service" version="6">
         <create_default_instance enabled="false"/>
 
         <single_instance/>
@@ -26,6 +26,7 @@
 
 
         <method_context>
+            <method_credential user='builderl' group='builderl'/>
             <method_environment>
                 <envvar name="HOME" value="/opt/builderl"/>
             </method_environment>
