@@ -48,6 +48,7 @@ package: rel
 	mkdir -p ${BUILDDIR}/opt/ ${BUILDTMP} "${BUILDDIR}/etc"
 
 	cp -R _rel/builderl_release ${BUILDDIR}/opt/builderl
+	rm ${BUILDDIR}/opt/builderl/builderl_release-*.tar.gz
 
 	# Config
 	cp omnios.config "${BUILDDIR}/etc/builderl.config"
