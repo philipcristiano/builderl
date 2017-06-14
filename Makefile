@@ -50,6 +50,9 @@ package: rel
 	cp -R _rel/builderl_release ${BUILDDIR}/opt/builderl
 	rm ${BUILDDIR}/opt/builderl/builderl_release-*.tar.gz
 
+	# Build dir
+	mkdir -p ${BUILDDIR}/var/lib/builderl
+
 	# Config
 	cp omnios.config "${BUILDDIR}/etc/builderl.config"
 

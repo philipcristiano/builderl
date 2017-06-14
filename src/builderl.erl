@@ -21,7 +21,8 @@ get_projects() ->
 
 build(Name, GitRepo, Opts) ->
     Time = erlang:monotonic_time(seconds),
-    Path = "/tmp/" ++ lists:flatten(io_lib:format("build~p",[Time])),
+    BuildDir = application:get_env(builderl, builds_directory, "/tmp"),
+    Path = BuildDir ++ "/" ++ lists:flatten(io_lib:format("build~p",[Time])),
     io:format("Build ~p~n", [{GitRepo, Path}]),
     BuilderlFile = Path ++ "/builderl.yml",
     IsDir = filelib:is_dir(Path),
