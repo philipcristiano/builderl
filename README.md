@@ -44,8 +44,10 @@ Configuration goes into the `local.config` file or (eventually) when deployed an
 Example:
 
 ```
-{global_env, [{"PATH", keep},
-              {"FOO", "BAR"}]}
+[{buildlerl, [
+  {global_env, [{"PATH", keep},
+                {"FOO", "BAR"}]}]}].
+```
 
 The HTTP port used by the web server can be changed with `port` (default 8080).
 
