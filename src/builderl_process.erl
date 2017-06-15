@@ -1,4 +1,5 @@
 -module(builderl_process).
+-compile({parse_transform, lager_transform}).
 
 -export([run/4]).
 

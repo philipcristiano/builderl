@@ -1,4 +1,5 @@
 -module(builderl).
+-compile({parse_transform, lager_transform}).
 
 -export([build/3,
          get_build_logs/2,
