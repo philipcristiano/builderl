@@ -51,7 +51,7 @@ package: rel
 	rm ${BUILDDIR}/opt/builderl/builderl_release-*.tar.gz
 
 	# Build dir
-	mkdir -p ${BUILDDIR}/var/lib/builderl
+	mkdir -p ${BUILDDIR}/var/lib/builderl/builds
 
 	# Config
 	cp omnios.config "${BUILDDIR}/etc/builderl.config"
