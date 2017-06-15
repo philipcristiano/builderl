@@ -67,6 +67,12 @@ The HTTP port used by the web server can be changed with `port` (default 8080).
 [{builderl, [{builds_directory, "/var/lib/builderl/builds"}]}].
 ```
 
+`build_logs_directory` - Location to log build output. Defaults to `/tmp` locally or `/var/lib/builderl/build_logs` when packaged.
+
+```
+[{builderl, [{build_logs_directory, "/var/lib/builderl/build_logs"}]}].
+```
+
 ## Build Files
 
 Builderl loads the `builderl.yml` file in the root of the project.

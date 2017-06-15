@@ -128,7 +128,9 @@ read_build(BR) ->
     file:read_file(Filename).
 
 filename_from_br(#buildrecord{id=BuildID, project=Name}) ->
-    lists:flatten(["/tmp/build-project-",
+    BuildDir = application:get_env(builderl, build_logs_directory, "/tmp"),
+    lists:flatten([BuildDir,
+                   "/build-project-",
                    Name,
                    "/",
                    BuildID]).
