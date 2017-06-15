@@ -26,7 +26,7 @@
 
 
         <method_context>
-            <method_credential user='builderl' group='builderl'/>
+            <method_credential user='builderl' group='builderl' privileges='basic,PRIV_NET_PRIVADDR'/>
             <method_environment>
                 <envvar name="HOME" value="/opt/builderl"/>
             </method_environment>
