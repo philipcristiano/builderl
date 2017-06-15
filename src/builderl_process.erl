@@ -38,6 +38,7 @@ output_to_console({data, Data}) ->
 
 create_output_to_newfile(Path) ->
     ok = filelib:ensure_dir(Path),
+    lager:debug("Creating output to newfile ~p", [Path]),
     {ok, IoD} = file:open(Path, [append]),
 
     Output = fun({data, {eol, Data}}) ->
