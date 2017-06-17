@@ -7,9 +7,9 @@ stages:
       - env
       - pwd
       - make deps app
+      - make package
 
-  - name: package
+  - name: publish
     match: "^master$"
     steps:
-      - make package
       - make publish
