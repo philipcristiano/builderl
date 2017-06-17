@@ -17,6 +17,7 @@ stages:
       - env
       - pwd
       - make deps app
+      - make tests
       - make package
 
   - name: publish
