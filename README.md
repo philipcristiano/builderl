@@ -18,7 +18,7 @@ pkg install pkg:/developer/build/gnu-make
 pkg install pkg:/developer/gcc51
 pkg install pkg:/system/header@0.5.11
 
-CC=gcc CXX="/usr/bin/g++ -m64" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make deps app
+CC=gcc CXX="/usr/bin/g++" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make deps app
 
 
 ```

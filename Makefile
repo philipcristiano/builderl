@@ -2,7 +2,7 @@ PROJECT = builderl
 PROJECT_DESCRIPTION = New project
 PROJECT_VERSION = 0.1.0
 
-DEPS = cowboy erlgit sh jsx yamerl lager uuid erlydtl
+DEPS = cowboy erlgit sh jsx yamerl lager uuid erlydtl letsencrypt jiffy
 LOCAL_DEPS = sasl
 SHELL_DEPS = sync
 dep_cowboy_commit = 2.0.0-pre.9
@@ -14,6 +14,9 @@ dep_yamerl = git https://github.com/yakaz/yamerl.git v0.4.0
 dep_lager = git https://github.com/erlang-lager/lager.git 3.4.1
 dep_uuid = git https://github.com/avtobiff/erlang-uuid.git v0.5.0
 dep_erlydtl = git https://github.com/erlydtl/erlydtl.git 0.12.1
+dep_letsencrypt = git https://github.com/gbour/letsencrypt-erlang.git 0.8.1
+# Get around ELFCLASS errors with older specified version
+dep_jiffy = git https://github.com/davisp/jiffy.git 0.14.11
 
 DEP_PLUGINS = cowboy
 
