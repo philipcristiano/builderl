@@ -49,7 +49,7 @@ Example:
                 {"FOO", "BAR"}]}]}].
 ```
 
-The HTTP port used by the web server can be changed with `port` (default 8080).
+The HTTP port used by the web server can be changed with `port` (default 8080 in development, 80 when packaged).
 
 ```
 [{builderl, [
