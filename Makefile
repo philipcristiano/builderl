@@ -56,6 +56,7 @@ package: rel
 	# Builderl runtime directories
 	mkdir -p ${BUILDDIR}/var/lib/builderl/builds
 	mkdir -p ${BUILDDIR}/var/lib/builderl/build_logs
+	mkdir -p ${BUILDDIR}/var/lib/builderl/certs
 
 	# Config
 	cp omnios.config "${BUILDDIR}/etc/builderl.config"

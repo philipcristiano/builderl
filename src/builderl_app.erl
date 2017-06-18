@@ -6,12 +6,8 @@
 -export([stop/1]).
 
 start(_Type, _Args) ->
-    Dispatch = cowboy_router:compile([
-        {'_', [{"/webhooks/github", builderl_github_webhook, builderl_github_webhook:state_init()},
-               {"/projects", builderl_projects_handler, builderl_projects_handler:state_init()},
-               {"/builds/:org/:repo", builderl_builds_handler, []},
-               {"/builds/:org/:repo/:build", builderl_build_handler, []}]
-    }]),
+    Dispatch = cowboy_router:compile([{'_', builderl_routes() ++ acme_routes()}]),
+
     Port = application:get_env(builderl, http_port, 8080),
     {ok, _} = cowboy:start_clear(my_http_listener, 10,
         [{port, Port}],
@@ -47,11 +43,11 @@ acme_routes() ->
     [{<<"/.well-known/acme-challenge/:token">>, letsencrypt_cowboy_handler, []}].
 
 start_letsencrypt() ->
-    {ok, _Pid} = letsencrypt:start([{mode,slave}, staging, {cert_path,"/var/lib/builderl/certs"}]),
+    {ok, _Pid} = letsencrypt:start([{mode,slave}, {cert_path,"/var/lib/builderl/certs"}]),
     MC = letsencrypt:make_cert(<<"builderl.stratobuilder.com">>, #{async => false}),
     {ok, CertMap} = MC,
     lager:info("Lets Encrypt ~p", [MC]),
     CertProps = [{certfile, binary:bin_to_list(maps:get(cert, CertMap))},
-                 {key, binary:bin_to_list(maps:get(key, CertMap))}],
+                 {keyfile, binary:bin_to_list(maps:get(key, CertMap))}],
 
     CertProps.
