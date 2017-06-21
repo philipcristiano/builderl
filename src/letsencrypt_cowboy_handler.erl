@@ -14,38 +14,31 @@
 
 -module(letsencrypt_cowboy_handler).
 
--export([init/3, handle/2, terminate/3]).
+-export([init/2, handle/2, terminate/3]).
 
 
-init(_, Req, []) ->
-    {Host,_} = cowboy_req:host(Req),
-    %io:format("COWBOY: host= ~p~n    req ~p~n", [Host,Req]),
-
+init(Req, _State) ->
+    Host = cowboy_req:host(Req),
     % NOTES
     %   - cowboy_req:binding() returns undefined is token not set in URI
     %   - letsencrypt:get_challenge() returns 'error' if token+thumbprint are not available
     %
     % NOTE: keep <18.0 compatibility
     Challenges = letsencrypt:get_challenge(),
-    {Token,_}  = cowboy_req:binding(token, Req),
+    Token  = cowboy_req:binding(token, Req),
 
-    {ok, Req2} = case maps:get(Host, Challenges, undefined) of
+    Req2 = case maps:get(Host, Challenges, undefined) of
         #{token := Token, thumbprint := Thumbprint} ->
-            %io:format("match: ~p -> ~p~n", [Token, Thumbprint]),
-            cowboy_req:reply(200, [{<<"content-type">>, <<"text/plain">>}], Thumbprint, Req);
+            cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">>}, Thumbprint, Req);
 
         _X     ->
-            %io:format("nomatch: ~p -> ~p~n", [Token, _X]),
             cowboy_req:reply(404, Req)
     end,
-    %io:format("reply= ~p~n", [Req2]),
 
     {ok, Req2, no_state}.
 
 handle(Req, State) ->
-    %io:format("handle: ~p~n", [Req]),
     {ok, Req, State}.
 
-terminate(Reason, Req, State) ->
-    %io:format("terminate: ~p~n", [Reason]),
+terminate(_Reason, _Req, _State) ->
     ok.
