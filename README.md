@@ -75,6 +75,8 @@ The HTTP port used by the web server can be changed with `port` (default 8080 in
 
 `ssl` - Enable SSL. Current accepted value is `lets_encrypt`. All other values are treated as `false` and.
 
+`domain` - Domain that resolves to the server location. Used for Lets Encrypt SSL setup and redirects for incorrect hosts (http -> https when SSL is used).
+
 ## Build Files
 
 Builderl loads the `builderl.yml` file in the root of the project.

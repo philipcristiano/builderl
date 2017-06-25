@@ -6,25 +6,38 @@
 -export([stop/1]).
 
 start(_Type, _Args) ->
-    Dispatch = cowboy_router:compile([{'_', builderl_routes() ++ acme_routes()}]),
-
-    Port = application:get_env(builderl, http_port, 8080),
-    {ok, _} = cowboy:start_clear(my_http_listener, 10,
-        [{port, Port}],
-        #{env => #{dispatch => Dispatch}}
-    ),
-    lager:info("HTTP listening on port ~p", [Port]),
-
     case application:get_env(builderl, ssl, false) of
-        letsencrypt -> Certs = start_letsencrypt(),
-                       start_tls(builderl_routes(), Certs);
-        _ -> ok
+        letsencrypt -> setup_cowboy_with_letsencrypt();
+        _ -> setup_cowboy_http()
     end,
 
 	  builderl_sup:start_link().
 
 stop(_State) ->
 	  ok.
+
+setup_cowboy_with_letsencrypt() ->
+    Dispatch = cowboy_router:compile([{'_', acme_routes() ++ https_redirect_routes()}]),
+
+    Port = 80,
+    {ok, _} = cowboy:start_clear(http, 10,
+        [{port, Port}],
+        #{env => #{dispatch => Dispatch}}
+    ),
+    lager:info("HTTP listening on port ~p", [Port]),
+
+    Certs = start_letsencrypt(),
+    start_tls(builderl_routes(), Certs).
+
+setup_cowboy_http() ->
+    Dispatch = cowboy_router:compile([{'_', builderl_routes()}]),
+
+    Port = application:get_env(builderl, http_port, 8080),
+    {ok, _} = cowboy:start_clear(http, 20,
+        [{port, Port}],
+        #{env => #{dispatch => Dispatch}}
+    ),
+    lager:info("HTTP listening on port ~p", [Port]).
 
 start_tls(Routes, Certs) ->
     Dispatch = cowboy_router:compile([{'_', Routes}]),
@@ -42,9 +55,15 @@ builderl_routes() ->
 acme_routes() ->
     [{<<"/.well-known/acme-challenge/:token">>, letsencrypt_cowboy_handler, []}].
 
+https_redirect_routes() ->
+    {ok, Domain} = application:get_env(builderl, domain),
+    [{'_', builderl_https_redirect_handler, [{domain, Domain}]}].
+
 start_letsencrypt() ->
+    {ok, Domain} = application:get_env(builderl, domain),
+    BDomain = binary:list_to_bin(Domain),
     {ok, _Pid} = letsencrypt:start([{mode,slave}, {cert_path,"/var/lib/builderl/certs"}]),
-    MC = letsencrypt:make_cert(<<"builderl.stratobuilder.com">>, #{async => false}),
+    MC = letsencrypt:make_cert(BDomain, #{async => false}),
     {ok, CertMap} = MC,
     lager:info("Lets Encrypt ~p", [MC]),
     CertProps = [{certfile, binary:bin_to_list(maps:get(cert, CertMap))},
