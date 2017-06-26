@@ -83,6 +83,31 @@ The HTTP port used by the web server can be changed with `port` (default 8080 in
 
 `domain` - Domain that resolves to the server location. Used for Lets Encrypt SSL setup and redirects for incorrect hosts (http -> https when SSL is used).
 
+```
+[{builder, [{domain, "builderl.example.com"}]}].
+```
+
+Example Configuration
+[{builderl, [
+  {ssl, letsencrypt},
+  {domain, "builderl.example.com"},
+  {http_port, 80},
+  {projects, ["philipcristiano/builderl"]},
+  {global_env, [{"PATH","/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:/usr/bin:/usr/sbin:/sbin"}]
+  }]
+ },
+ {lager, [
+  {handlers, [
+    {lager_console_backend, debug},
+    {lager_file_backend, [{file, "log/error.log"}, {level, error}]},
+    {lager_file_backend, [{file, "log/info.log"}, {level, info}]},
+    {lager_file_backend, [{file, "log/debug.log"}, {level, debug}]},
+    {lager_file_backend, [{file, "log/console.log"}, {level, info}]}
+  ]}
+]}
+].
+
+
 ## Build Files
 
 Builderl loads the `builderl.yml` file in the root of the project.
