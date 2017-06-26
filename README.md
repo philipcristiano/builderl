@@ -73,6 +73,12 @@ The HTTP port used by the web server can be changed with `port` (default 8080 in
 [{builderl, [{build_logs_directory, "/var/lib/builderl/build_logs"}]}].
 ```
 
+`certificates_directory` - Location to store Lets Encrypt certificates. Defaults to `/var/lib/builderl/certs` when packaged.
+
+```
+[{builderl, [{build_logs_directory, "/var/lib/builderl/build_logs"}]}].
+```
+
 `ssl` - Enable SSL. Current accepted value is `lets_encrypt`. All other values are treated as `false` and.
 
 `domain` - Domain that resolves to the server location. Used for Lets Encrypt SSL setup and redirects for incorrect hosts (http -> https when SSL is used).

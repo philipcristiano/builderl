@@ -61,8 +61,9 @@ https_redirect_routes() ->
 
 start_letsencrypt() ->
     {ok, Domain} = application:get_env(builderl, domain),
+    {ok, CertDir} = application:get_env(builderl, certificates_directory),
     BDomain = binary:list_to_bin(Domain),
-    {ok, _Pid} = letsencrypt:start([{mode,slave}, {cert_path,"/var/lib/builderl/certs"}]),
+    {ok, _Pid} = letsencrypt:start([{mode,slave}, {cert_path, CertDir}]),
     MC = letsencrypt:make_cert(BDomain, #{async => false}),
     {ok, CertMap} = MC,
     lager:info("Lets Encrypt ~p", [MC]),
