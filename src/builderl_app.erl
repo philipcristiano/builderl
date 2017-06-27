@@ -77,9 +77,11 @@ start_letsencrypt() ->
                 {ok, CertMap} = MC,
                 lager:info("Lets Encrypt ~p", [MC]),
                 [{certfile, binary:bin_to_list(maps:get(cert, CertMap))},
+                 {cacertfile, binary:bin_to_list(maps:get(cacert, CertMap))},
                  {keyfile, binary:bin_to_list(maps:get(key, CertMap))}];
-        false -> [{certfile, binary:bin_to_list(CertDir ++ "/" ++ Domain ++ ".crt")},
-                 {keyfile, binary:bin_to_list(CertDir ++ "/" ++ Domain ++ ".key")}]
+        false -> [{certfile, CertDir ++ "/" ++ Domain ++ ".crt"},
+                  {cacertfile, CertDir ++ "/" ++ Domain ++ ".ca.crt"},
+                 {keyfile, CertDir ++ "/" ++ Domain ++ ".key"}]
     end,
 
     CertProps.
