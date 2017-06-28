@@ -12,14 +12,14 @@ run(Command, Dir, Env, Func) ->
     [Cmd|Args] = string:tokens(Command, " "),
     % Use the Env PATH to find the executable!
     PATH = proplists:get_value("PATH", Env),
-    io:format("Finding command with PATH of ~p~n", [PATH]),
+    lager:debug("Finding command with PATH of ~p", [PATH]),
     Exec = os:find_executable(Cmd, PATH),
-    io:format("Command ~p~n", [Exec]),
+    lager:debug("Command ~p", [Exec]),
     Port = erlang:open_port({spawn_executable, Exec},
         [stream, stderr_to_stdout, binary, exit_status,
          {args, Args}, {cd, Dir}, {env, Env}]),
     Status = loop(Port, Func),
-    io:format("Status ~p~n",[Status]),
+    lager:debug("Status ~p",[Status]),
     Status.
 
 loop(Port, Fun) ->
@@ -31,11 +31,11 @@ loop(Port, Fun) ->
 
 
 output_to_console({data, {eol, Data}}) ->
-    io:format("eol ~p~n", [Data]);
+    lager:debug("eol ~p", [Data]);
 output_to_console({data, {noeol, Data}}) ->
-    io:format("noeol ~p", [Data]);
+    lager:debug("noeol ~p", [Data]);
 output_to_console({data, Data}) ->
-    io:format("boop data ~p~n", [Data]).
+    lager:debug("boop data ~p", [Data]).
 
 create_output_to_newfile(Path) ->
     ok = filelib:ensure_dir(Path),

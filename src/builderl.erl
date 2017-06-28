@@ -24,7 +24,7 @@ build(Name, GitRepo, Opts) ->
     Time = erlang:monotonic_time(seconds),
     BuildDir = application:get_env(builderl, builds_directory, "/tmp"),
     Path = BuildDir ++ "/" ++ lists:flatten(io_lib:format("build~p",[Time])),
-    io:format("Build ~p~n", [{GitRepo, Path}]),
+    lager:debug("Build ~p", [{GitRepo, Path}]),
     BuilderlFile = Path ++ "/builderl.yml",
     IsDir = filelib:is_dir(Path),
     clone_if_needed(IsDir, GitRepo, Path),
@@ -37,28 +37,28 @@ build(Name, GitRepo, Opts) ->
                     committish=CommitIsh,
                     ref=Ref},
 
-    io:format("Commit-ish ~p~n", [CommitIsh]),
+    lager:debug("Commit-ish ~p", [CommitIsh]),
     checkout_ref(Path, CommitIsh),
     build_project(Path, BuilderlFile, BR),
 
     ok.
 
 clone_if_needed(false, GitRepo, Path) ->
-    io:format("Clone ~n"),
+    lager:debug("Clone "),
     {ok, _Text} = git:clone(GitRepo, Path),
     ok;
 clone_if_needed(true, _GitRepo, Path) ->
-    io:format("Fetch ~n"),
+    lager:debug("Fetch "),
     {ok, _Test} = git:fetch(Path),
     ok.
 
 build_project(CWD, BuilderlFile, BR=#buildrecord{}) ->
-    io:format("Build project ~p~n", [BuilderlFile]),
+    lager:debug("Build project ~p", [BuilderlFile]),
     [BuildConfig] = yamerl_constr:file(BuilderlFile),
-    io:format("File ~p~n", [BuildConfig]),
+    lager:debug("File ~p", [BuildConfig]),
     Stages = proplists:get_value("stages", BuildConfig),
     BuildFileEnv = proplists:get_value("environment", BuildConfig, []),
-    io:format("FileEnv ~p~n", [BuildFileEnv]),
+    lager:debug("FileEnv ~p", [BuildFileEnv]),
     execute_stages(Stages, CWD, BR, BuildFileEnv),
     ok.
 
@@ -94,7 +94,7 @@ short_ref(<<"heads">>, ShortRef) ->
     {branch, ShortRef}.
 
 execute_steps([Step|Steps], Dir, BR=#buildrecord{}, BuildFileEnv) ->
-    io:format("Step: ~p in ~p~n", [Step, Dir]),
+    lager:debug("Step: ~p in ~p", [Step, Dir]),
 
     Env = get_empty_env(),
     GlobalEnv = get_global_env(),
