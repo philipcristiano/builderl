@@ -27,7 +27,8 @@ loop(Port, Fun) ->
     receive
         {Port, {exit_status, Status}} -> Status;
         {Port, Msg} -> Fun(Msg),
-                       loop(Port, Fun)
+                       loop(Port, Fun);
+        Msg -> lager:info("Unhandled loop message ~p", [Msg])
     end.
 
 
