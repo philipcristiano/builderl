@@ -18,6 +18,7 @@ run(Command, Dir, Env, Func) ->
     Port = erlang:open_port({spawn_executable, Exec},
         [stream, stderr_to_stdout, binary, exit_status,
          {args, Args}, {cd, Dir}, {env, Env}]),
+    lager:debug("Port started, entering IO loop"),
     Status = loop(Port, Func),
     lager:debug("Status ~p",[Status]),
     Status.
