@@ -107,13 +107,15 @@ execute_steps([Step|Steps], Dir, BR=#buildrecord{}, BuildFileEnv) ->
     Env4 = merge_env(Env3, BuildFileEnv),
 
     Filename = filename_from_br(BR),
-    0 = builderl_process:run(Step, Dir, Env4, {file, Filename}),
+    Status = builderl_process:run(Step, Dir, Env4, {file, Filename}),
     % {ok, _} = exec:run(Step, [{stdout, print}, {stderr, print}, {cd, Dir}, sync, EnvOpt]),
-
-    execute_steps(Steps,
-                  Dir,
-                  BR#buildrecord{step_count=BR#buildrecord.step_count + 1},
-                  BuildFileEnv),
+    case Status of
+        0 -> execute_steps(Steps,
+                           Dir,
+                           BR#buildrecord{step_count=BR#buildrecord.step_count + 1},
+                           BuildFileEnv);
+        _ -> lager:debug("Step exited non-zero")
+    end,
     ok;
 execute_steps([], _Dir, _BR, _BuildFileEnv) ->
     ok.
