@@ -2,6 +2,7 @@
 -compile({parse_transform, lager_transform}).
 
 -export([build/3,
+         build_proc/1,
          get_build_logs/2,
          get_empty_env/0,
          get_global_env/0,
@@ -10,6 +11,7 @@
 
 -record(buildrecord, {id=undefined,
                       project=undefined,
+                      repo=undefined,
                       stage_count=0,
                       committish=undefined,
                       ref=undefined,
@@ -21,6 +23,21 @@ get_projects() ->
     BinProjects.
 
 build(Name, GitRepo, Opts) ->
+    Ref = proplists:get_value(ref, Opts, "Unknown"),
+    CommitIsh = proplists:get_value(commit_ish, Opts, "master"),
+
+    {ok, BuildID} = builderl_build_registry:create(Name, Ref, CommitIsh),
+    BR=#buildrecord{id=BuildID,
+                    project=Name,
+                    repo=GitRepo,
+                    committish=CommitIsh,
+                    ref=Ref},
+    erlang:spawn(builderl, build_proc, [BR]),
+    {ok, BuildID}.
+
+build_proc(BR=#buildrecord{committish=CommitIsh, repo=GitRepo}) ->
+    lager:debug("Commit-ish ~p", [CommitIsh]),
+
     Time = erlang:monotonic_time(seconds),
     BuildDir = application:get_env(builderl, builds_directory, "/tmp"),
     Path = BuildDir ++ "/" ++ lists:flatten(io_lib:format("build~p",[Time])),
@@ -29,15 +46,6 @@ build(Name, GitRepo, Opts) ->
     IsDir = filelib:is_dir(Path),
     clone_if_needed(IsDir, GitRepo, Path),
 
-    CommitIsh = proplists:get_value(commit_ish, Opts, "master"),
-    Ref = proplists:get_value(ref, Opts, "Unknown"),
-    {ok, BuildID} = builderl_build_registry:create(Name, Ref, CommitIsh),
-    BR=#buildrecord{id=BuildID,
-                    project=Name,
-                    committish=CommitIsh,
-                    ref=Ref},
-
-    lager:debug("Commit-ish ~p", [CommitIsh]),
     checkout_ref(Path, CommitIsh),
     build_project(Path, BuilderlFile, BR),
 
