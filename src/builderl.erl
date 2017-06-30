@@ -2,6 +2,7 @@
 -compile({parse_transform, lager_transform}).
 
 -export([build/3,
+         build_proc/1,
          get_build_logs/2,
          get_empty_env/0,
          get_global_env/0,
@@ -10,6 +11,7 @@
 
 -record(buildrecord, {id=undefined,
                       project=undefined,
+                      repo=undefined,
                       stage_count=0,
                       committish=undefined,
                       ref=undefined,
@@ -21,44 +23,50 @@ get_projects() ->
     BinProjects.
 
 build(Name, GitRepo, Opts) ->
+    Ref = proplists:get_value(ref, Opts, "Unknown"),
+    CommitIsh = proplists:get_value(commit_ish, Opts, "master"),
+
+    {ok, BuildID} = builderl_build_registry:create(Name, Ref, CommitIsh),
+    BR=#buildrecord{id=BuildID,
+                    project=Name,
+                    repo=GitRepo,
+                    committish=CommitIsh,
+                    ref=Ref},
+    erlang:spawn(builderl, build_proc, [BR]),
+    {ok, BuildID}.
+
+build_proc(BR=#buildrecord{committish=CommitIsh, repo=GitRepo}) ->
+    lager:debug("Commit-ish ~p", [CommitIsh]),
+
     Time = erlang:monotonic_time(seconds),
     BuildDir = application:get_env(builderl, builds_directory, "/tmp"),
     Path = BuildDir ++ "/" ++ lists:flatten(io_lib:format("build~p",[Time])),
-    io:format("Build ~p~n", [{GitRepo, Path}]),
+    lager:debug("Build ~p", [{GitRepo, Path}]),
     BuilderlFile = Path ++ "/builderl.yml",
     IsDir = filelib:is_dir(Path),
     clone_if_needed(IsDir, GitRepo, Path),
 
-    CommitIsh = proplists:get_value(commit_ish, Opts, "master"),
-    Ref = proplists:get_value(ref, Opts, "Unknown"),
-    {ok, BuildID} = builderl_build_registry:create(Name, Ref, CommitIsh),
-    BR=#buildrecord{id=BuildID,
-                    project=Name,
-                    committish=CommitIsh,
-                    ref=Ref},
-
-    io:format("Commit-ish ~p~n", [CommitIsh]),
     checkout_ref(Path, CommitIsh),
     build_project(Path, BuilderlFile, BR),
 
     ok.
 
 clone_if_needed(false, GitRepo, Path) ->
-    io:format("Clone ~n"),
+    lager:debug("Clone "),
     {ok, _Text} = git:clone(GitRepo, Path),
     ok;
 clone_if_needed(true, _GitRepo, Path) ->
-    io:format("Fetch ~n"),
+    lager:debug("Fetch "),
     {ok, _Test} = git:fetch(Path),
     ok.
 
 build_project(CWD, BuilderlFile, BR=#buildrecord{}) ->
-    io:format("Build project ~p~n", [BuilderlFile]),
+    lager:debug("Build project ~p", [BuilderlFile]),
     [BuildConfig] = yamerl_constr:file(BuilderlFile),
-    io:format("File ~p~n", [BuildConfig]),
+    lager:debug("File ~p", [BuildConfig]),
     Stages = proplists:get_value("stages", BuildConfig),
     BuildFileEnv = proplists:get_value("environment", BuildConfig, []),
-    io:format("FileEnv ~p~n", [BuildFileEnv]),
+    lager:debug("FileEnv ~p", [BuildFileEnv]),
     execute_stages(Stages, CWD, BR, BuildFileEnv),
     ok.
 
@@ -94,7 +102,7 @@ short_ref(<<"heads">>, ShortRef) ->
     {branch, ShortRef}.
 
 execute_steps([Step|Steps], Dir, BR=#buildrecord{}, BuildFileEnv) ->
-    io:format("Step: ~p in ~p~n", [Step, Dir]),
+    lager:debug("Step: ~p in ~p", [Step, Dir]),
 
     Env = get_empty_env(),
     GlobalEnv = get_global_env(),
@@ -107,13 +115,15 @@ execute_steps([Step|Steps], Dir, BR=#buildrecord{}, BuildFileEnv) ->
     Env4 = merge_env(Env3, BuildFileEnv),
 
     Filename = filename_from_br(BR),
-    0 = builderl_process:run(Step, Dir, Env4, {file, Filename}),
+    Status = builderl_process:run(Step, Dir, Env4, {file, Filename}),
     % {ok, _} = exec:run(Step, [{stdout, print}, {stderr, print}, {cd, Dir}, sync, EnvOpt]),
-
-    execute_steps(Steps,
-                  Dir,
-                  BR#buildrecord{step_count=BR#buildrecord.step_count + 1},
-                  BuildFileEnv),
+    case Status of
+        0 -> execute_steps(Steps,
+                           Dir,
+                           BR#buildrecord{step_count=BR#buildrecord.step_count + 1},
+                           BuildFileEnv);
+        _ -> lager:debug("Step exited non-zero")
+    end,
     ok;
 execute_steps([], _Dir, _BR, _BuildFileEnv) ->
     ok.

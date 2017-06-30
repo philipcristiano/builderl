@@ -1,5 +1,15 @@
+packages:
+  # Currently unused block, hopefully supported in the future
+  - pkg:/developer/gcc51
+  - omniti/runtime/erlang@19.0.0
+  - pkg:/archiver/gnu-tar
+  - pkg:/system/header
+
 environment:
     FOO: BAR
+    CC: gcc
+    CXX: /usr/bin/g++
+
 
 stages:
   - name: build
@@ -7,9 +17,10 @@ stages:
       - env
       - pwd
       - make deps app
+      - make tests
+      - make package
 
-  - name: package
+  - name: publish
     match: "^master$"
     steps:
-      - make package
       - make publish
