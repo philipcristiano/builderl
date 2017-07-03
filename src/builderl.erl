@@ -75,21 +75,22 @@ execute_stages([Stage|Stages], Dir, BR=#buildrecord{ref=Ref}, BuildFileEnv) ->
 
     Steps = proplists:get_value("steps", Stage),
     RefMatcher = proplists:get_value("match", Stage, ".*"),
-    case re:run(ShortRef, RefMatcher) of
+    StepState = case re:run(ShortRef, RefMatcher) of
         % No match or error, don't need to run anything
         nomatch -> ok;
         {error, _ErrorType} -> ok;
         % match or {match, captured} run these steps
         _ -> execute_steps(Steps, Dir, BR#buildrecord{step_count=0}, BuildFileEnv)
     end,
-    execute_stages(Stages,
-                   Dir,
-                   BR#buildrecord{stage_count=BR#buildrecord.stage_count + 1},
-                   BuildFileEnv),
-    ok;
+    case StepState of
+        ok -> execute_stages(Stages,
+                             Dir,
+                             BR#buildrecord{stage_count=BR#buildrecord.stage_count + 1},
+                             BuildFileEnv);
+        _ -> ok
+    end;
 execute_stages([], _Dir, #buildrecord{id=ID}, _BuildFileEnv) ->
-    builderl_build_registry:set_build_state(ID, successful),
-    ok.
+    builderl_build_registry:set_build_state(ID, successful).
 
 
 short_ref(Ref) ->
@@ -101,7 +102,7 @@ short_ref(<<"tags">>, ShortRef) ->
 short_ref(<<"heads">>, ShortRef) ->
     {branch, ShortRef}.
 
-execute_steps([Step|Steps], Dir, BR=#buildrecord{}, BuildFileEnv) ->
+execute_steps([Step|Steps], Dir, BR=#buildrecord{id=ID}, BuildFileEnv) ->
     lager:debug("Step: ~p in ~p", [Step, Dir]),
 
     Env = get_empty_env(),
@@ -122,9 +123,10 @@ execute_steps([Step|Steps], Dir, BR=#buildrecord{}, BuildFileEnv) ->
                            Dir,
                            BR#buildrecord{step_count=BR#buildrecord.step_count + 1},
                            BuildFileEnv);
-        _ -> lager:debug("Step exited non-zero")
-    end,
-    ok;
+        _ -> ok = builderl_build_registry:set_build_state(ID, failed),
+             lager:debug("Step exited non-zero"),
+             error
+    end;
 execute_steps([], _Dir, _BR, _BuildFileEnv) ->
     ok.
 

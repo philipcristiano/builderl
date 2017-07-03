@@ -86,7 +86,7 @@ handle_call({get_builds, Project}, _From, State) ->
 
 handle_call({get_build, _Project, ID}, _From, State) ->
     BID = uuid:to_binary(ID),
-    io:format("ID ~p~n", [{BID, ID}]),
+    lager:debug("ID ~p~n", [{BID, ID}]),
     [Objects] = dets:lookup(?TABLE, BID),
 	  {reply, {ok, Objects}, State};
 
@@ -96,10 +96,11 @@ handle_call(get_projects, _From, State) ->
 
 handle_call({set_build_state, ID, BRState}, _From, State) ->
     BID = uuid:to_binary(ID),
-    io:format("ID ~p~n", [BID]),
+    lager:debug("ID ~p~n", [BID]),
     [BR0] = dets:lookup(?TABLE, BID),
-    io:format("Item ~p~n", [BR0]),
+    lager:debug("Item ~p~n", [BR0]),
     BR1 = BR0#builderl_build_record{state=BRState},
+    lager:debug("Save item ~p", [BR1]),
     dets:insert(?TABLE, BR1),
     {reply, ok, State};
 
@@ -113,7 +114,6 @@ builds_to_proplist([{Project, ID, Ref, Commitish, Time}|Rest]) ->
      {commitish, Commitish},
      {time, Time}]| builds_to_proplist(Rest)];
 builds_to_proplist([#builderl_build_record{project=P, id=ID, ref=R, committish=C, time=T, state=S}|Rest]) ->
-    lager:info("State ~p", [S]),
     [[{id, uuid:to_string(simple, ID)},
      {project, P},
      {ref, R},
