@@ -114,7 +114,6 @@ builds_to_proplist([{Project, ID, Ref, Commitish, Time}|Rest]) ->
      {commitish, Commitish},
      {time, Time}]| builds_to_proplist(Rest)];
 builds_to_proplist([#builderl_build_record{project=P, id=ID, ref=R, committish=C, time=T, state=S}|Rest]) ->
-    lager:info("State ~p", [S]),
     [[{id, uuid:to_string(simple, ID)},
      {project, P},
      {ref, R},
