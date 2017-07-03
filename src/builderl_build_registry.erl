@@ -100,6 +100,7 @@ handle_call({set_build_state, ID, BRState}, _From, State) ->
     [BR0] = dets:lookup(?TABLE, BID),
     lager:debug("Item ~p~n", [BR0]),
     BR1 = BR0#builderl_build_record{state=BRState},
+    lager:debug("Save item ~p", [BR1]),
     dets:insert(?TABLE, BR1),
     {reply, ok, State};
 
