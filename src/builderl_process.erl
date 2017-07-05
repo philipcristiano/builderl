@@ -1,12 +1,12 @@
 -module(builderl_process).
 -compile({parse_transform, lager_transform}).
 
--export([run/4]).
+-export([run/4, save_msg/2]).
 
 run(Command, Dir, Env, console) ->
     run(Command, Dir, Env, fun output_to_console/1);
 run(Command, Dir, Env, {file, Path}) ->
-    Output = create_output_to_newfile(Path),
+    Output = write_output_to_file(Path),
     run(Command, Dir, Env, Output);
 run(Command, Dir, Env, Func) ->
     [Cmd|Args] = string:tokens(Command, " "),
@@ -31,6 +31,11 @@ loop(Port, Fun) ->
         Msg -> lager:info("Unhandled loop message ~p", [Msg])
     end.
 
+save_msg({file, Path}, Msg) ->
+    ok = filelib:ensure_dir(Path),
+    lager:debug("Writing output to file ~p", [Path]),
+    {ok, IoD} = file:open(Path, [append]),
+    file:write(IoD, ["Builderl message: ", Msg, "\n"]).
 
 output_to_console({data, {eol, Data}}) ->
     lager:debug("eol ~p", [Data]);
@@ -39,7 +44,7 @@ output_to_console({data, {noeol, Data}}) ->
 output_to_console({data, Data}) ->
     lager:debug("boop data ~p", [Data]).
 
-create_output_to_newfile(Path) ->
+write_output_to_file(Path) ->
     ok = filelib:ensure_dir(Path),
     lager:debug("Writing output to file ~p", [Path]),
     {ok, IoD} = file:open(Path, [append]),

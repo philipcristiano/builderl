@@ -46,7 +46,7 @@ build_proc(BR=#buildrecord{committish=CommitIsh, repo=GitRepo}) ->
     IsDir = filelib:is_dir(Path),
     clone_if_needed(IsDir, GitRepo, Path),
 
-    checkout_ref(Path, CommitIsh),
+    checkout_ref(Path, CommitIsh, BR),
     build_project(Path, BuilderlFile, BR),
 
     ok.
@@ -147,8 +147,13 @@ filename_from_br(#buildrecord{id=BuildID, project=Name}) ->
                    "/",
                    BuildID]).
 
-checkout_ref(Path, Ref) ->
+checkout_ref(Path, Ref, BR) ->
+    build_record_message(BR, ["Checking out project ", Ref, " to ", Path]),
     git:checkout(Path, Ref).
+
+build_record_message(BR, Msg) ->
+    Filename = filename_from_br(BR),
+    ok = builderl_process:save_msg({file, Filename}, Msg).
 
 run() ->
     build("philipcristiano/AWSMF-Data",
