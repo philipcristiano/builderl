@@ -63,8 +63,9 @@ clone_if_needed(true, _GitRepo, Path) ->
     {ok, _Test} = git:fetch(Path),
     ok.
 
-build_project(CWD, BuilderlFile, BR=#buildrecord{}) ->
+build_project(CWD, BuilderlFile, BR=#buildrecord{id=ID}) ->
     lager:debug("Build project ~p", [BuilderlFile]),
+    builderl_build_registry:set_build_state(ID, running),
     [BuildConfig] = yamerl_constr:file(BuilderlFile),
     lager:debug("File ~p", [BuildConfig]),
     Stages = proplists:get_value("stages", BuildConfig),
