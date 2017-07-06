@@ -15,8 +15,15 @@ init(Req0=#{method := <<"POST">>}, State) ->
     Projects = proplists:get_value(projects, State),
     Data = jsx:decode(Body, [return_maps]),
 
+    % Validate project is in whitelist
     Repo = maps:get(<<"repository">>, Data, #{}),
     FullName = maps:get(<<"full_name">>, Repo),
+    IsMember = lists:member(FullName, Projects),
+
+    Resp = handle_webhook(IsMember, FullName, Data, Repo, Req1),
+    {ok, Resp, State}.
+
+handle_webhook(true, FullName, Data, Repo, Req) ->
     Url = maps:get(<<"url">>, Repo),
     Ref = maps:get(<<"ref">>, Data),
     CommitIsh = binary:bin_to_list(maps:get(<<"after">>, Data)),
@@ -24,20 +31,17 @@ init(Req0=#{method := <<"POST">>}, State) ->
     Req2 = cowboy_req:reply(200,
         #{<<"content-type">> => <<"text/plain">>},
         << <<"Hello Erlang! ">>/binary, FullName/binary, Url/binary, Ref/binary >>,
-        Req1),
+        Req),
 
-    io:format("Member ~p~n", [FullName]),
     NameL = binary:bin_to_list(FullName),
     LRef = binary:bin_to_list(Ref),
-    IsMember = lists:member(FullName, Projects),
-    trigger_build(IsMember, NameL, Url, CommitIsh, LRef),
+    trigger_build(NameL, Url, CommitIsh, LRef),
+    Req2;
 
-    {ok, Req2, State}.
+handle_webhook(false, _FullName, _Data, _Repo, _Req) ->
+    ok.
 
-trigger_build(true, FullName, Url, CommitIsh, Ref) ->
+trigger_build(FullName, Url, CommitIsh, Ref) ->
     io:format("Building~n"),
     builderl:build(FullName, Url, [{commit_ish, CommitIsh},
-                                   {ref, Ref}]);
-trigger_build(false, _FullName, _Url, _CommitIsh, _Ref) ->
-    io:format("Not a whitelisted project~n"),
-    ok.
+                                   {ref, Ref}]).
