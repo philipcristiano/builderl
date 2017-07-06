@@ -56,10 +56,11 @@ The HTTP port used by the web server can be changed with `port` (default 8080 in
   {http_port, 8080}]}].
 ```
 
-`projects` - A list of Github Org/Repo strings for whitelisted projects to build.
+`projects` - A list of Github Org/Repo strings for whitelisted projects to build and their options
 
 ```
-[{projects, ["philipcristiano/builderl"]}].
+[{projects, [{"philipcristiano/builderl", []}]}].
+```
 
 `builds_directory` - Location to checkout/build repositories. Defaults to `/tmp` locally or `/var/lib/builderl/builds` when packaged.
 

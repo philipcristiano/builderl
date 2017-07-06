@@ -19,7 +19,7 @@
 
 get_projects() ->
     Projects = application:get_env(builderl, projects, []),
-    BinProjects = [ binary:list_to_bin(P) || P <- Projects ],
+    BinProjects = [ binary:list_to_bin(P) || {P, _Config} <- Projects ],
     BinProjects.
 
 build(Name, GitRepo, Opts) ->
