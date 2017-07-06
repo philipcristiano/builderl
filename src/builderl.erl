@@ -35,7 +35,7 @@ build(Name, GitRepo, Opts) ->
     erlang:spawn(builderl, build_proc, [BR]),
     {ok, BuildID}.
 
-build_proc(BR=#buildrecord{committish=CommitIsh, repo=GitRepo}) ->
+build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepo}) ->
     lager:debug("Commit-ish ~p", [CommitIsh]),
 
     Time = erlang:monotonic_time(seconds),
@@ -46,9 +46,12 @@ build_proc(BR=#buildrecord{committish=CommitIsh, repo=GitRepo}) ->
     IsDir = filelib:is_dir(Path),
     clone_if_needed(IsDir, GitRepo, Path),
 
-    checkout_ref(Path, CommitIsh),
+    ok = case checkout_ref(Path, CommitIsh, BR) of
+        ok -> ok;
+        error -> builderl_build_registry:set_build_state(ID, checkout_failed),
+                 error
+    end,
     build_project(Path, BuilderlFile, BR),
-
     ok.
 
 clone_if_needed(false, GitRepo, Path) ->
@@ -60,8 +63,9 @@ clone_if_needed(true, _GitRepo, Path) ->
     {ok, _Test} = git:fetch(Path),
     ok.
 
-build_project(CWD, BuilderlFile, BR=#buildrecord{}) ->
+build_project(CWD, BuilderlFile, BR=#buildrecord{id=ID}) ->
     lager:debug("Build project ~p", [BuilderlFile]),
+    builderl_build_registry:set_build_state(ID, running),
     [BuildConfig] = yamerl_constr:file(BuilderlFile),
     lager:debug("File ~p", [BuildConfig]),
     Stages = proplists:get_value("stages", BuildConfig),
@@ -147,8 +151,21 @@ filename_from_br(#buildrecord{id=BuildID, project=Name}) ->
                    "/",
                    BuildID]).
 
-checkout_ref(Path, Ref) ->
-    git:checkout(Path, Ref).
+checkout_ref(Path, Ref, BR) ->
+    build_record_message(BR, ["Checking out project ", Ref, " to ", Path]),
+    Resp = git:checkout(Path, Ref),
+    handle_checkout(Resp, BR).
+
+handle_checkout({ok, _Msg}, BR) ->
+    build_record_message(BR, ["Checkout succeeded!"]),
+    ok;
+handle_checkout({_, {_Code, Msg}}, BR) ->
+    build_record_message(BR, ["Checkout failed! ", Msg]),
+    error.
+
+build_record_message(BR, Msg) ->
+    Filename = filename_from_br(BR),
+    ok = builderl_process:save_msg({file, Filename}, Msg).
 
 run() ->
     build("philipcristiano/AWSMF-Data",
