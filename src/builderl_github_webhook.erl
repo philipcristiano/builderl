@@ -38,8 +38,12 @@ handle_webhook(true, FullName, Data, Repo, Req) ->
     trigger_build(NameL, Url, CommitIsh, LRef),
     Req2;
 
-handle_webhook(false, _FullName, _Data, _Repo, _Req) ->
-    ok.
+handle_webhook(false, FullName, _Data, _Repo, Req) ->
+    Req2 = cowboy_req:reply(400,
+        #{<<"content-type">> => <<"text/plain">>},
+        << FullName/binary, <<" is not in the builderl whitelist">>/binary >>,
+        Req),
+    Req2.
 
 trigger_build(FullName, Url, CommitIsh, Ref) ->
     io:format("Building~n"),
