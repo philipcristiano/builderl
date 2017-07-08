@@ -58,8 +58,22 @@ The HTTP port used by the web server can be changed with `port` (default 8080 in
 
 `projects` - A list of Github Org/Repo strings for whitelisted projects to build and their options
 
+Options:
+
+* github_webhook_secret - [The secret supplied to Github to verify webhooks](https://developer.github.com/webhooks/securing/)
+
+Minimal example:
 ```
 [{projects, [{"philipcristiano/builderl", []}]}].
+```
+
+Full example:
+
+```
+[{projects, [{"philipcristiano/builderl", [
+                {github_webhook_secret, "$SECRET"}
+            ]}]
+}].
 ```
 
 `builds_directory` - Location to checkout/build repositories. Defaults to `/tmp` locally or `/var/lib/builderl/builds` when packaged.
@@ -93,7 +107,9 @@ Example Configuration
   {ssl, letsencrypt},
   {domain, "builderl.example.com"},
   {http_port, 80},
-  {projects, ["philipcristiano/builderl"]},
+  {projects, [{"philipcristiano/builderl", [
+                {github_webhook_secret, "$SECRET"}
+  ]}]},
   {global_env, [{"PATH","/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:/usr/bin:/usr/sbin:/sbin"}]
   }]
  },
