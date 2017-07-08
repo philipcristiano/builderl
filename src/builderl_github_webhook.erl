@@ -46,6 +46,6 @@ handle_webhook(false, FullName, _Data, _Repo, Req) ->
     Req2.
 
 trigger_build(FullName, Url, CommitIsh, Ref) ->
-    io:format("Building~n"),
+    lager:debug("Trigger build from webhook for ~p", [FullName]),
     builderl:build(FullName, Url, [{commit_ish, CommitIsh},
                                    {ref, Ref}]).
