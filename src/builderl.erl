@@ -7,6 +7,7 @@
          get_empty_env/0,
          get_global_env/0,
          get_projects/0,
+         get_project_config_value/2,
          run/0]).
 
 -record(buildrecord, {id=undefined,
@@ -19,8 +20,14 @@
 
 get_projects() ->
     Projects = application:get_env(builderl, projects, []),
-    BinProjects = [ binary:list_to_bin(P) || P <- Projects ],
+    BinProjects = [ binary:list_to_bin(P) || {P, _Config} <- Projects ],
     BinProjects.
+
+get_project_config_value(BProject, Key) when is_binary(BProject) ->
+    Project = binary:bin_to_list(BProject),
+    Projects = application:get_env(builderl, projects, []),
+    Config = proplists:get_value(Project, Projects, []),
+    proplists:get_value(Key, Config, undefined).
 
 build(Name, GitRepo, Opts) ->
     Ref = proplists:get_value(ref, Opts, "Unknown"),
