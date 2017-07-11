@@ -18,6 +18,7 @@ stages:
       - pwd
       - make deps app
       - make tests
+      - cat cover/index.html
       - make package
 
   - name: publish

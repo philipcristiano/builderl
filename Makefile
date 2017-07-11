@@ -6,6 +6,7 @@ DEPS = cowboy erlgit sh jsx yamerl lager uuid erlydtl letsencrypt jiffy
 LOCAL_DEPS = sasl
 SHELL_DEPS = sync
 TEST_DEPS = meck
+COVER = 1
 
 dep_cowboy_commit = 2.0.0-pre.9
 dep_erlgit = git https://github.com/gleber/erlgit v0.7.5
