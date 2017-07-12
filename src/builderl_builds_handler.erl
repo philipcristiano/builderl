@@ -9,10 +9,10 @@
 init(Req0=#{method := <<"GET">>}, State) ->
     Org = cowboy_req:binding(org, Req0),
     Repo = cowboy_req:binding(repo, Req0),
-    lager:info("Org/Repo ~p/~p", [Org, Repo]),
+    ok = lager:info("Org/Repo ~p/~p", [Org, Repo]),
     Project = string:join([binary:bin_to_list(Org), binary:bin_to_list(Repo)], "/"),
     {ok, Builds} = builderl_build_registry:get_builds(Project),
-    % lager:debug("builds ~p", [Builds]),
+    % ok = lager:debug("builds ~p", [Builds]),
     SortedBuilds = proplist_sort(time, Builds),
 
     % Data = jsx:encode(#{builds => build_ids(BuildIDs)}),

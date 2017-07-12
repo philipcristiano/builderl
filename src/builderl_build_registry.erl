@@ -62,7 +62,7 @@ init([]) ->
 handle_call({create, {Project, Ref, Commitish}}, _From, State) ->
     ID = uuid:uuid4(),
     SID = uuid:to_string(simple, ID),
-    lager:info("Generated ID ~p", [SID]),
+    ok = lager:info("Generated ID ~p", [SID]),
     Time = os:system_time(seconds),
     Record = #builderl_build_record{id=ID,
                                     project=Project,
@@ -71,7 +71,7 @@ handle_call({create, {Project, Ref, Commitish}}, _From, State) ->
                                     state=created,
                                     time=Time},
     ok = dets:insert(?TABLE, Record),
-    dets:sync(?TABLE),
+    ok = dets:sync(?TABLE),
 	  {reply, {ok, SID}, State};
 
 handle_call({get_builds, Project}, _From, State) ->
@@ -86,7 +86,7 @@ handle_call({get_builds, Project}, _From, State) ->
 
 handle_call({get_build, _Project, ID}, _From, State) ->
     BID = uuid:to_binary(ID),
-    lager:debug("ID ~p~n", [{BID, ID}]),
+    ok = lager:debug("ID ~p~n", [{BID, ID}]),
     [Objects] = dets:lookup(?TABLE, BID),
 	  {reply, {ok, Objects}, State};
 
@@ -96,12 +96,12 @@ handle_call(get_projects, _From, State) ->
 
 handle_call({set_build_state, ID, BRState}, _From, State) ->
     BID = uuid:to_binary(ID),
-    lager:debug("ID ~p~n", [BID]),
+    ok = lager:debug("ID ~p~n", [BID]),
     [BR0] = dets:lookup(?TABLE, BID),
-    lager:debug("Item ~p~n", [BR0]),
+    ok = lager:debug("Item ~p~n", [BR0]),
     BR1 = BR0#builderl_build_record{state=BRState},
-    lager:debug("Save item ~p", [BR1]),
-    dets:insert(?TABLE, BR1),
+    ok = lager:debug("Save item ~p", [BR1]),
+    ok = dets:insert(?TABLE, BR1),
     {reply, ok, State};
 
 handle_call(_Request, _From, State) ->

@@ -18,6 +18,7 @@ stages:
       - pwd
       - make deps app
       - make tests
+      - make dialyze
       - cat cover/index.html
       - make package
 
