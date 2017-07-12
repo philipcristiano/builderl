@@ -5,6 +5,9 @@ PROJECT_VERSION = 0.1.0
 DEPS = cowboy erlgit sh jsx yamerl lager uuid erlydtl letsencrypt jiffy
 LOCAL_DEPS = sasl
 SHELL_DEPS = sync
+TEST_DEPS = meck
+COVER ?= 1
+
 dep_cowboy_commit = 2.0.0-pre.9
 dep_erlgit = git https://github.com/gleber/erlgit v0.7.5
 dep_sh = git https://github.com/gleber/sh.git master
@@ -17,6 +20,8 @@ dep_erlydtl = git https://github.com/erlydtl/erlydtl.git 0.12.1
 dep_letsencrypt = git https://github.com/philipcristiano/letsencrypt-erlang.git cacert-file
 # Get around ELFCLASS errors with older specified version
 dep_jiffy = git https://github.com/davisp/jiffy.git 0.14.11
+
+dep_meck = git https://github.com/eproxus/meck.git 0.8.4
 
 DEP_PLUGINS = cowboy
 

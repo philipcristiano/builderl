@@ -11,7 +11,7 @@ state_init() ->
 
 init(Req0=#{method := <<"GET">>}, State) ->
     Projects = proplists:get_value(projects, State),
-    lager:info("projects ~p", [Projects]),
+    ok = lager:info("projects ~p", [Projects]),
 
     {ok, Data} = tmpl_projects_dtl:render([{projects, Projects}]),
 

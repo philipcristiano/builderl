@@ -43,12 +43,12 @@ build(Name, GitRepo, Opts) ->
     {ok, BuildID}.
 
 build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepo}) ->
-    lager:debug("Commit-ish ~p", [CommitIsh]),
+    ok = lager:debug("Commit-ish ~p", [CommitIsh]),
 
     Time = erlang:monotonic_time(seconds),
     BuildDir = application:get_env(builderl, builds_directory, "/tmp"),
     Path = BuildDir ++ "/" ++ lists:flatten(io_lib:format("build~p",[Time])),
-    lager:debug("Build ~p", [{GitRepo, Path}]),
+    ok = lager:debug("Build ~p", [{GitRepo, Path}]),
     BuilderlFile = Path ++ "/builderl.yml",
     IsDir = filelib:is_dir(Path),
     clone_if_needed(IsDir, GitRepo, Path),
@@ -62,22 +62,22 @@ build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepo}) ->
     ok.
 
 clone_if_needed(false, GitRepo, Path) ->
-    lager:debug("Clone "),
+    ok = lager:debug("Clone "),
     {ok, _Text} = git:clone(GitRepo, Path),
     ok;
 clone_if_needed(true, _GitRepo, Path) ->
-    lager:debug("Fetch "),
+    ok = lager:debug("Fetch "),
     {ok, _Test} = git:fetch(Path),
     ok.
 
 build_project(CWD, BuilderlFile, BR=#buildrecord{id=ID}) ->
-    lager:debug("Build project ~p", [BuilderlFile]),
+    ok = lager:debug("Build project ~p", [BuilderlFile]),
     builderl_build_registry:set_build_state(ID, running),
     [BuildConfig] = yamerl_constr:file(BuilderlFile),
-    lager:debug("File ~p", [BuildConfig]),
+    ok = lager:debug("File ~p", [BuildConfig]),
     Stages = proplists:get_value("stages", BuildConfig),
     BuildFileEnv = proplists:get_value("environment", BuildConfig, []),
-    lager:debug("FileEnv ~p", [BuildFileEnv]),
+    ok = lager:debug("FileEnv ~p", [BuildFileEnv]),
     execute_stages(Stages, CWD, BR, BuildFileEnv),
     ok.
 
@@ -89,9 +89,8 @@ execute_stages([Stage|Stages], Dir, BR=#buildrecord{ref=Ref}, BuildFileEnv) ->
     StepState = case re:run(ShortRef, RefMatcher) of
         % No match or error, don't need to run anything
         nomatch -> ok;
-        {error, _ErrorType} -> ok;
         % match or {match, captured} run these steps
-        _ -> execute_steps(Steps, Dir, BR#buildrecord{step_count=0}, BuildFileEnv)
+        {match, _} -> execute_steps(Steps, Dir, BR#buildrecord{step_count=0}, BuildFileEnv)
     end,
     case StepState of
         ok -> execute_stages(Stages,
@@ -114,7 +113,7 @@ short_ref(<<"heads">>, ShortRef) ->
     {branch, ShortRef}.
 
 execute_steps([Step|Steps], Dir, BR=#buildrecord{id=ID}, BuildFileEnv) ->
-    lager:debug("Step: ~p in ~p", [Step, Dir]),
+    ok = lager:debug("Step: ~p in ~p", [Step, Dir]),
 
     Env = get_empty_env(),
     GlobalEnv = get_global_env(),
@@ -135,7 +134,7 @@ execute_steps([Step|Steps], Dir, BR=#buildrecord{id=ID}, BuildFileEnv) ->
                            BR#buildrecord{step_count=BR#buildrecord.step_count + 1},
                            BuildFileEnv);
         _ -> ok = builderl_build_registry:set_build_state(ID, failed),
-             lager:debug("Step exited non-zero"),
+             ok = lager:debug("Step exited non-zero"),
              error
     end;
 execute_steps([], _Dir, _BR, _BuildFileEnv) ->

@@ -9,9 +9,9 @@
 
 start(_Type, _Args) ->
     SU = should_update_cert("crt.crt"),
-    lager:info("Key info ~p", [SU]),
+    ok = lager:info("Key info ~p", [SU]),
     SU2 = should_update_cert("crt2.crt"),
-    lager:info("Key info ~p", [SU2]),
+    ok = lager:info("Key info ~p", [SU2]),
     case application:get_env(builderl, ssl, false) of
         letsencrypt -> setup_cowboy_with_letsencrypt();
         _ -> setup_cowboy_http()
@@ -30,10 +30,10 @@ setup_cowboy_with_letsencrypt() ->
         [{port, Port}],
         #{env => #{dispatch => Dispatch}}
     ),
-    lager:info("HTTP listening on port ~p", [Port]),
+    ok = lager:info("HTTP listening on port ~p", [Port]),
 
     Certs = start_letsencrypt(),
-    start_tls(builderl_routes(), Certs).
+    ok = start_tls(builderl_routes(), Certs).
 
 setup_cowboy_http() ->
     Dispatch = cowboy_router:compile([{'_', builderl_routes()}]),
@@ -43,14 +43,15 @@ setup_cowboy_http() ->
         [{port, Port}],
         #{env => #{dispatch => Dispatch}}
     ),
-    lager:info("HTTP listening on port ~p", [Port]).
+    ok = lager:info("HTTP listening on port ~p", [Port]).
 
 start_tls(Routes, Certs) ->
     Dispatch = cowboy_router:compile([{'_', Routes}]),
     Options = [{port, 443}] ++ Certs,
-    lager:info("Starting TLS with options ~p", [Options]),
+    ok = lager:info("Starting TLS with options ~p", [Options]),
     {ok, _} = cowboy:start_tls(https, 10, Options,
-                               #{env => #{dispatch => Dispatch}}).
+                               #{env => #{dispatch => Dispatch}}),
+    ok.
 
 builderl_routes() ->
     [{"/webhooks/github", builderl_github_webhook, builderl_github_webhook:state_init()},
@@ -75,7 +76,7 @@ start_letsencrypt() ->
                 {ok, _Pid} = letsencrypt:start([{mode,slave}, {cert_path, CertDir}]),
                 MC = letsencrypt:make_cert(BDomain, #{async => false}),
                 {ok, CertMap} = MC,
-                lager:info("Lets Encrypt ~p", [MC]),
+                ok = lager:info("Lets Encrypt ~p", [MC]),
                 [{certfile, binary:bin_to_list(maps:get(cert, CertMap))},
                  {cacertfile, binary:bin_to_list(maps:get(cacert, CertMap))},
                  {keyfile, binary:bin_to_list(maps:get(key, CertMap))}];

@@ -13,3 +13,6 @@ rel/example_project
 /_rel/
 local.config
 /log/*
+/logs/*
+/cover/*
+eunit.coverdata
