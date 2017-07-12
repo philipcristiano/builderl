@@ -59,19 +59,19 @@ post_body_to_record(Body) ->
                      ref=Ref,
                      committish=CommitIsh}}.
 
-
-handle_whitelist_member(true, #push_event{full_name=FullName, url=Url, ref=Ref, committish=CommitIsh}, Req) ->
-
-    Req2 = cowboy_req:reply(200,
+handle_whitelist_member(true, #push_event{committish="0000000000000000000000000000000000000000"}, Req) ->
+    Resp = cowboy_req:reply(200,
+        #{<<"content-type">> => <<"text/plain">>},
+        <<"Push event deleted branch, not triggering a build.">>,
+        Req),
+    Resp;
+handle_whitelist_member(true, PE=#push_event{full_name=FullName, url=Url, ref=Ref}, Req) ->
+    {ok, _} = trigger_build(PE),
+    Resp = cowboy_req:reply(200,
         #{<<"content-type">> => <<"text/plain">>},
         << <<"Hello Erlang! ">>/binary, FullName/binary, Url/binary, Ref/binary >>,
         Req),
-
-    NameL = binary:bin_to_list(FullName),
-    LRef = binary:bin_to_list(Ref),
-    {ok, _} = trigger_build(NameL, Url, CommitIsh, LRef),
-    Req2;
-
+    Resp;
 handle_whitelist_member(false, #push_event{full_name=FullName}, Req) ->
     Req2 = cowboy_req:reply(400,
         #{<<"content-type">> => <<"text/plain">>},
@@ -79,7 +79,9 @@ handle_whitelist_member(false, #push_event{full_name=FullName}, Req) ->
         Req),
     Req2.
 
-trigger_build(FullName, Url, CommitIsh, Ref) ->
-    ok = lager:debug("Trigger build from webhook for ~p", [FullName]),
-    builderl:build(FullName, Url, [{commit_ish, CommitIsh},
-                                   {ref, Ref}]).
+trigger_build(#push_event{full_name=FullName, url=Url, committish=CommitIsh, ref=Ref}) ->
+    NameL = binary:bin_to_list(FullName),
+    LRef = binary:bin_to_list(Ref),
+    ok = lager:debug("Trigger build from webhook for ~p", [NameL]),
+    builderl:build(NameL, Url, [{commit_ish, CommitIsh},
+                                {ref, LRef}]).
