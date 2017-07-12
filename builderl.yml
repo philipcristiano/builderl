@@ -9,6 +9,7 @@ environment:
     FOO: BAR
     CC: gcc
     CXX: /usr/bin/g++
+    COVER: "0"
 
 
 stages:
@@ -19,7 +20,6 @@ stages:
       - make deps app
       - make tests
       # - make dialyze
-      - cat cover/index.html
       - make package
 
   - name: publish
