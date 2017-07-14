@@ -9,7 +9,7 @@ environment:
     FOO: BAR
     CC: gcc
     CXX: /usr/bin/g++
-    COVER: 0
+    COVER: 2
 
 
 stages:
