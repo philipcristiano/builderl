@@ -90,4 +90,7 @@ endif
 	pkgsend publish -s ${PKGSRVR} -d ${BUILDDIR} ${BUILDTMP}/pkg.pm5.final
 	pkgrepo refresh -s ${PKGSRVR}
 
+.PHONY:test
+test: tests
+
 include erlang.mk

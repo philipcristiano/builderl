@@ -8,6 +8,7 @@
          get_global_env/0,
          get_projects/0,
          get_project_config_value/2,
+         validate_builderl_config/1,
          run/0]).
 
 -record(buildrecord, {id=undefined,
@@ -77,8 +78,11 @@ build_project(CWD, BuilderlFile, BR=#buildrecord{id=ID}) ->
     ok = lager:debug("File ~p", [BuildConfig]),
     Stages = proplists:get_value("stages", BuildConfig),
     BuildFileEnv = proplists:get_value("environment", BuildConfig, []),
-    ok = lager:debug("FileEnv ~p", [BuildFileEnv]),
-    execute_stages(Stages, CWD, BR, BuildFileEnv),
+    case validate_builderl_config(BuildConfig) of
+        ok -> execute_stages(Stages, CWD, BR, BuildFileEnv);
+        {error, ErrorMsg} -> build_record_message(BR, ErrorMsg),
+                             builderl_build_registry:set_build_state(ID, config_error)
+    end,
     ok.
 
 execute_stages([Stage|Stages], Dir, BR=#buildrecord{ref=Ref}, BuildFileEnv) ->
@@ -102,7 +106,6 @@ execute_stages([Stage|Stages], Dir, BR=#buildrecord{ref=Ref}, BuildFileEnv) ->
 execute_stages([], _Dir, #buildrecord{id=ID}, _BuildFileEnv) ->
     builderl_build_registry:set_build_state(ID, successful).
 
-
 short_ref(Ref) ->
     [<<"refs">>, B, Rest] = re:split(Ref, "/", [{parts , 3}]),
     short_ref(B, Rest).
@@ -124,6 +127,7 @@ execute_steps([Step|Steps], Dir, BR=#buildrecord{id=ID}, BuildFileEnv) ->
     Env2 = merge_env(Env1, BREnv),
     Env3 = merge_env(Env2, NeededEnv),
     Env4 = merge_env(Env3, BuildFileEnv),
+    lager:debug("Build env ~p", [Env4]),
 
     Filename = filename_from_br(BR),
     Status = builderl_process:run(Step, Dir, Env4, {file, Filename}),
@@ -207,3 +211,20 @@ process_config([{Var, Val} | Config]) ->
     [{Var, Val} | process_config(Config)];
 process_config([]) ->
     [].
+
+
+-spec validate_builderl_config(list()) -> ok | {error, list()}.
+validate_builderl_config(Config) ->
+    Env = proplists:get_value("environment", Config, []),
+    case proplist_is_strings(Env) of
+        true -> ok;
+        false -> {error, "Environment variables must be strings"}
+    end.
+
+-spec proplist_is_strings(list()) -> true | false.
+proplist_is_strings([]) ->
+    true;
+proplist_is_strings([{_Key, Value}| L]) when is_list(Value) ->
+    proplist_is_strings(L);
+proplist_is_strings(_)  ->
+    false.
