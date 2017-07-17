@@ -16,3 +16,4 @@ local.config
 /logs/*
 /cover/*
 eunit.coverdata
+test/ct.cover.spec
