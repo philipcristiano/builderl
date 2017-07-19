@@ -128,7 +128,7 @@ execute_steps([Step|Steps], Dir, BR=#buildrecord{id=ID}, BuildFileEnv) ->
     Env2 = merge_env(Env1, BREnv),
     Env3 = merge_env(Env2, NeededEnv),
     Env4 = merge_env(Env3, BuildFileEnv),
-    lager:debug("Build env ~p", [Env4]),
+    ok = lager:debug("Build env ~p", [Env4]),
 
     Filename = filename_from_br(BR),
     Status = builderl_process:run(Step, Dir, Env4, {file, Filename}),
