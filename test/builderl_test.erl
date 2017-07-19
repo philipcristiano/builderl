@@ -28,3 +28,14 @@ re_match(Subject, RE) ->
                    false;
         {match, _} -> true
     end.
+
+get_projects_test_() ->
+    ProjectConfig = [{"project_1", config}],
+    meck:new(application, [unstick]),
+    meck:expect(application, get_env, fun(builderl, projects, []) -> ProjectConfig end),
+
+    Projects = builderl:get_projects(),
+
+    meck:unload(application),
+
+    [?_assertEqual([<<"project_1">>], Projects)].

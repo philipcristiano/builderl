@@ -19,6 +19,7 @@
                       ref=undefined,
                       step_count=0}).
 
+-spec get_projects() -> list().
 get_projects() ->
     Projects = application:get_env(builderl, projects, []),
     BinProjects = [ binary:list_to_bin(P) || {P, _Config} <- Projects ],
