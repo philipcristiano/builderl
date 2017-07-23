@@ -25,6 +25,7 @@ get_projects() ->
     BinProjects = [ binary:list_to_bin(P) || {P, _Config} <- Projects ],
     BinProjects.
 
+-spec get_project_config_value(binary(), atom()) -> any().
 get_project_config_value(BProject, Key) when is_binary(BProject) ->
     Project = binary:bin_to_list(BProject),
     Projects = application:get_env(builderl, projects, []),
