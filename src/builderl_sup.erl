@@ -10,9 +10,9 @@ start_link() ->
 init([]) ->
   FileBase = application:get_env(builderl, root, "tmp"),
 
-	Procs = [
+  Procs = [
         #{id    => builderl_build_registry,
           start => {builderl_build_registry, start_link, [FileBase]}
         }
     ],
-	{ok, {{one_for_one, 1, 5}, Procs}}.
+  {ok, {{one_for_one, 1, 5}, Procs}}.
