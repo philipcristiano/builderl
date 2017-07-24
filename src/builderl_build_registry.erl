@@ -4,7 +4,7 @@
 -include_lib("stdlib/include/ms_transform.hrl").
 
 %% API.
--export([start_link/0]).
+-export([start_link/1]).
 
 %% gen_server.
 -export([init/1]).
@@ -28,9 +28,9 @@
 
 %% API.
 
--spec start_link() -> {ok, pid()}.
-start_link() ->
-	  gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+-spec start_link(atom()) -> {ok, pid()}.
+start_link(FileBase) ->
+	  gen_server:start_link({local, ?MODULE}, ?MODULE, [FileBase], []).
 
 create(Project, Ref, Commitish) ->
     gen_server:call(?MODULE, {create, {Project, Ref, Commitish}}).
@@ -49,8 +49,7 @@ set_build_state(ID, State) ->
 
 %% gen_server.
 
-init([]) ->
-    FileBase = application:get_env(builderl, root, "tmp"),
+init([FileBase]) ->
     Filename = filename:join([FileBase, "dets", "build_registry_set"]),
     ok = lager:info("Build registry file ~p", [Filename]),
     ok = filelib:ensure_dir(Filename),
