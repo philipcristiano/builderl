@@ -32,12 +32,14 @@
 start_link(FileBase) ->
 	  gen_server:start_link({local, ?MODULE}, ?MODULE, [FileBase], []).
 
+-spec create(nonempty_list(), nonempty_list(), nonempty_list()) -> {ok, nonempty_list()}.
 create(Project, Ref, Commitish) ->
     gen_server:call(?MODULE, {create, {Project, Ref, Commitish}}).
 
 get_builds(Project) when is_list(Project) ->
     gen_server:call(?MODULE, {get_builds, Project}).
 
+-spec get_build(nonempty_list(), nonempty_list()) -> {ok, nonempty_list()}.
 get_build(Project, ID) when is_list(ID)->
     gen_server:call(?MODULE, {get_build, Project, ID}).
 
@@ -86,8 +88,9 @@ handle_call({get_builds, Project}, _From, State) ->
 handle_call({get_build, _Project, ID}, _From, State) ->
     BID = uuid:to_binary(ID),
     ok = lager:debug("ID ~p~n", [{BID, ID}]),
-    [Objects] = dets:lookup(?TABLE, BID),
-	  {reply, {ok, Objects}, State};
+    Objects = dets:lookup(?TABLE, BID),
+    [Builds] = builds_to_proplist(Objects),
+	  {reply, {ok, Builds}, State};
 
 handle_call(get_projects, _From, State) ->
     Projects = keys(?TABLE),
