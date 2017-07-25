@@ -17,7 +17,6 @@
 -export([create/3,
          get_build/2,
          get_builds/1,
-         get_projects/0,
          set_build_state/2]).
 
 -record(state, {
@@ -43,9 +42,6 @@ get_builds(Project) when is_list(Project) ->
 -spec get_build(nonempty_list(), nonempty_list()) -> {ok, nonempty_list()}.
 get_build(Project, ID) when is_list(ID)->
     gen_server:call(?MODULE, {get_build, Project, ID}).
-
-get_projects() ->
-    gen_server:call(?MODULE, get_projects).
 
 -spec set_build_state(nonempty_list(), atom()) -> ok.
 set_build_state(ID, State) ->
@@ -94,10 +90,6 @@ handle_call({get_build, _Project, ID}, _From, State) ->
     [Builds] = builds_to_proplist(Objects),
 	  {reply, {ok, Builds}, State};
 
-handle_call(get_projects, _From, State) ->
-    Projects = keys(?TABLE),
-    {reply, {ok, Projects}, State};
-
 handle_call({set_build_state, ID, BRState}, _From, State) ->
     BID = uuid:to_binary(ID),
     ok = lager:debug("ID ~p~n", [BID]),
@@ -127,17 +119,6 @@ builds_to_proplist([#builderl_build_record{project=P, id=ID, ref=R, committish=C
 
 builds_to_proplist([]) ->
     [].
-
-% Get keys of a table
-keys(TableName) ->
-    FirstKey = dets:first(TableName),
-        keys(TableName, FirstKey, [FirstKey]).
-
-keys(_TableName, '$end_of_table', ['$end_of_table'|Acc]) ->
-    Acc;
-keys(TableName, CurrentKey, Acc) ->
-    NextKey = dets:next(TableName, CurrentKey),
-    keys(TableName, NextKey, [NextKey|Acc]).
 
 handle_cast(_Msg, State) ->
 	{noreply, State}.
