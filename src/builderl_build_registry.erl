@@ -36,6 +36,7 @@ start_link(FileBase) ->
 create(Project, Ref, Commitish) ->
     gen_server:call(?MODULE, {create, {Project, Ref, Commitish}}).
 
+-spec get_builds(nonempty_list()) -> {ok, nonempty_list()}.
 get_builds(Project) when is_list(Project) ->
     gen_server:call(?MODULE, {get_builds, Project}).
 
@@ -46,6 +47,7 @@ get_build(Project, ID) when is_list(ID)->
 get_projects() ->
     gen_server:call(?MODULE, get_projects).
 
+-spec set_build_state(nonempty_list(), atom()) -> ok.
 set_build_state(ID, State) ->
     gen_server:call(?MODULE, {set_build_state, ID, State}).
 
