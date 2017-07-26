@@ -63,9 +63,11 @@ teard_project_config(_Config) ->
 get_project_config_value(_Config) ->
     Val = builderl:get_project_config_value(<<"project_1">>, key),
     [?_assertEqual(value, Val)].
+
 get_project_config_no_value(_Config) ->
     Val = builderl:get_project_config_value(<<"project_1">>, invalid_key),
     [?_assertEqual(undefined, Val)].
+
 get_project_config_no_project(_Config) ->
     Val = builderl:get_project_config_value(<<"invalid_project">>, key),
     [?_assertEqual(undefined, Val)].
