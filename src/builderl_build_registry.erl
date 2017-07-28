@@ -4,7 +4,7 @@
 -include_lib("stdlib/include/ms_transform.hrl").
 
 %% API.
--export([start_link/0]).
+-export([start_link/1]).
 
 %% gen_server.
 -export([init/1]).
@@ -17,7 +17,6 @@
 -export([create/3,
          get_build/2,
          get_builds/1,
-         get_projects/0,
          set_build_state/2]).
 
 -record(state, {
@@ -28,29 +27,29 @@
 
 %% API.
 
--spec start_link() -> {ok, pid()}.
-start_link() ->
-	  gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+-spec start_link(atom()) -> {ok, pid()}.
+start_link(FileBase) ->
+	  gen_server:start_link({local, ?MODULE}, ?MODULE, [FileBase], []).
 
+-spec create(nonempty_list(), nonempty_list(), nonempty_list()) -> {ok, nonempty_list()}.
 create(Project, Ref, Commitish) ->
     gen_server:call(?MODULE, {create, {Project, Ref, Commitish}}).
 
+-spec get_builds(nonempty_list()) -> {ok, nonempty_list()}.
 get_builds(Project) when is_list(Project) ->
     gen_server:call(?MODULE, {get_builds, Project}).
 
+-spec get_build(nonempty_list(), nonempty_list()) -> {ok, nonempty_list()}.
 get_build(Project, ID) when is_list(ID)->
     gen_server:call(?MODULE, {get_build, Project, ID}).
 
-get_projects() ->
-    gen_server:call(?MODULE, get_projects).
-
+-spec set_build_state(nonempty_list(), atom()) -> ok.
 set_build_state(ID, State) ->
     gen_server:call(?MODULE, {set_build_state, ID, State}).
 
 %% gen_server.
 
-init([]) ->
-    FileBase = application:get_env(builderl, root, "tmp"),
+init([FileBase]) ->
     Filename = filename:join([FileBase, "dets", "build_registry_set"]),
     ok = lager:info("Build registry file ~p", [Filename]),
     ok = filelib:ensure_dir(Filename),
@@ -87,12 +86,9 @@ handle_call({get_builds, Project}, _From, State) ->
 handle_call({get_build, _Project, ID}, _From, State) ->
     BID = uuid:to_binary(ID),
     ok = lager:debug("ID ~p~n", [{BID, ID}]),
-    [Objects] = dets:lookup(?TABLE, BID),
-	  {reply, {ok, Objects}, State};
-
-handle_call(get_projects, _From, State) ->
-    Projects = keys(?TABLE),
-    {reply, {ok, Projects}, State};
+    Objects = dets:lookup(?TABLE, BID),
+    [Builds] = builds_to_proplist(Objects),
+	  {reply, {ok, Builds}, State};
 
 handle_call({set_build_state, ID, BRState}, _From, State) ->
     BID = uuid:to_binary(ID),
@@ -123,17 +119,6 @@ builds_to_proplist([#builderl_build_record{project=P, id=ID, ref=R, committish=C
 
 builds_to_proplist([]) ->
     [].
-
-% Get keys of a table
-keys(TableName) ->
-    FirstKey = dets:first(TableName),
-        keys(TableName, FirstKey, [FirstKey]).
-
-keys(_TableName, '$end_of_table', ['$end_of_table'|Acc]) ->
-    Acc;
-keys(TableName, CurrentKey, Acc) ->
-    NextKey = dets:next(TableName, CurrentKey),
-    keys(TableName, NextKey, [NextKey|Acc]).
 
 handle_cast(_Msg, State) ->
 	{noreply, State}.

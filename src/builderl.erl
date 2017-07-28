@@ -19,11 +19,13 @@
                       ref=undefined,
                       step_count=0}).
 
+-spec get_projects() -> list().
 get_projects() ->
     Projects = application:get_env(builderl, projects, []),
     BinProjects = [ binary:list_to_bin(P) || {P, _Config} <- Projects ],
     BinProjects.
 
+-spec get_project_config_value(binary(), atom()) -> any().
 get_project_config_value(BProject, Key) when is_binary(BProject) ->
     Project = binary:bin_to_list(BProject),
     Projects = application:get_env(builderl, projects, []),
@@ -127,7 +129,7 @@ execute_steps([Step|Steps], Dir, BR=#buildrecord{id=ID}, BuildFileEnv) ->
     Env2 = merge_env(Env1, BREnv),
     Env3 = merge_env(Env2, NeededEnv),
     Env4 = merge_env(Env3, BuildFileEnv),
-    lager:debug("Build env ~p", [Env4]),
+    ok = lager:debug("Build env ~p", [Env4]),
 
     Filename = filename_from_br(BR),
     Status = builderl_process:run(Step, Dir, Env4, {file, Filename}),
