@@ -33,7 +33,7 @@ get_project_config_value(BProject, Key) when is_binary(BProject) ->
     proplists:get_value(Key, Config, undefined).
 
 build(Name, GitRepo, Opts) ->
-    Ref = proplists:get_value(ref, Opts, "Unknown"),
+    Ref = proplists:get_value(ref, Opts, "refs/heads/master"),
     CommitIsh = proplists:get_value(commit_ish, Opts, "master"),
 
     {ok, BuildID} = builderl_build_registry:create(Name, Ref, CommitIsh),
