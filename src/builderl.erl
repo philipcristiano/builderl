@@ -2,7 +2,7 @@
 -compile({parse_transform, lager_transform}).
 
 -export([build/3,
-         build_proc/1,
+         build_proc/2,
          get_build_logs/2,
          get_empty_env/0,
          get_global_env/0,
@@ -42,14 +42,17 @@ build(Name, GitRepo, Opts) ->
                     repo=GitRepo,
                     committish=CommitIsh,
                     ref=Ref},
-    erlang:spawn(builderl, build_proc, [BR]),
+    SpawnFun = proplists:get_value(spawn_fun, Opts, fun erlang:spawn/3),
+    SpawnFun(builderl, build_proc, [BR, Opts]),
     {ok, BuildID}.
 
-build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepo}) ->
+build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepo}, Opts) ->
     ok = lager:debug("Commit-ish ~p", [CommitIsh]),
-
     Time = erlang:monotonic_time(seconds),
-    BuildDir = application:get_env(builderl, builds_directory, "/tmp"),
+
+    BuildDirArg = proplists:get_value(builds_directory, Opts, "/tmp"),
+    BuildDir = application:get_env(builderl, builds_directory, BuildDirArg),
+
     Path = BuildDir ++ "/" ++ lists:flatten(io_lib:format("build~p",[Time])),
     ok = lager:debug("Build ~p", [{GitRepo, Path}]),
     BuilderlFile = Path ++ "/builderl.yml",
