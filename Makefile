@@ -16,7 +16,7 @@ dep_sync = git https://github.com/rustyio/sync.git master
 dep_jsx = git https://github.com/talentdeficit/jsx.git v2.8.2
 dep_yamerl = git https://github.com/yakaz/yamerl.git v0.4.0
 dep_lager = git https://github.com/erlang-lager/lager.git 3.4.1
-dep_uuid = git https://github.com/avtobiff/erlang-uuid.git v0.5.0
+dep_uuid = git https://github.com/avtobiff/erlang-uuid.git v0.5.1
 dep_erlydtl = git https://github.com/philipcristiano/erlydtl.git master
 dep_letsencrypt = git https://github.com/philipcristiano/letsencrypt-erlang.git cacert-file
 # Get around ELFCLASS errors with older specified version
