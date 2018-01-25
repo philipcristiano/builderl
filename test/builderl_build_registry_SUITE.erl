@@ -48,7 +48,7 @@ ab_create_and_list_builds(Config) ->
     Ref = "ref",
     Commitish = "committish",
 
-    {ok, ID} = ?MUT:create(Project, Ref, Commitish),
+    {ok, _ID} = ?MUT:create(Project, Ref, Commitish),
     {ok, Builds} = ?MUT:get_builds(Project),
 
     lager:debug("Builds ~p", [Builds]),
