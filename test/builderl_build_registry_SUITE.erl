@@ -22,30 +22,9 @@ groups() -> [{test_init,
 
 init_per_testcase(_, Config) ->
     ok = lager_common_test_backend:bounce(debug),
-    % lager:debug("CT Config ~p", [Config]),
-
-    % ok = meck:new(erlcloud_s3, []),
-    % ok = meck:new(erlcloud_aws, []),
-    % ok = meck:new(sssftp_user_session, []),
-    % Contents = [
-    %     [{key, "uploads/USER/file.txt"},
-    %      {content_length, 1024}]],
-
-    % ok = meck:expect(erlcloud_s3, list_objects, fun(_, _, _) -> [{contents, Contents}] end),
-    % ok = meck:expect(erlcloud_aws, auto_config, fun() -> {ok, autoconfig} end),
-    % ok = meck:expect(sssftp_user_session, get, fun(user_auth_server, _) -> {ok, "USER"} end),
-
-    % State0 = [{aws_bucket, "TESTBUCKET"},
-    %           {user_auth_server, user_auth_server}],
-    % {_, State1} = ?MUT:get_cwd(State0),
-
-    % InitState = {initstate, State1},
-    % [InitState | Config].
     Config.
 
 end_per_testcase(_, Config) ->
-    % ok = meck:unload(erlcloud_s3),
-    % ok = meck:unload(sssftp_user_session),
     Config.
 
 aa_create_and_get_build(Config) ->
