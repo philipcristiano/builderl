@@ -15,10 +15,10 @@ started.
 pkg install pkg:/omniti/runtime/erlang@19.0.0
 pkg install pkg:/developer/versioning/git
 pkg install pkg:/developer/build/gnu-make
-pkg install pkg:/developer/gcc51
+pkg install pkg:/developer/gcc5
 pkg install pkg:/system/header@0.5.11
 
-CC=gcc CXX="/usr/bin/g++" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make deps app
+CC=gcc CXX="/usr/bin/g++" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5/bin:$PATH make deps app
 
 
 ```

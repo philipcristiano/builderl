@@ -19,8 +19,7 @@
          get_builds/1,
          set_build_state/2]).
 
--record(state, {
-}).
+-record(state, {}).
 
 -define(TABLE, build_registry).
 -record(builderl_build_record, {id, project, ref, committish, state, time}).

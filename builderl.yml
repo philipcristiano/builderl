@@ -9,8 +9,6 @@ environment:
     FOO: BAR
     CC: gcc
     CXX: /usr/bin/g++
-    COVER: "0"
-
 
 stages:
   - name: build
