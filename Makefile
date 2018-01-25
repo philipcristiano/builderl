@@ -6,7 +6,6 @@ DEPS = cowboy erlgit sh jsx yamerl lager uuid erlydtl letsencrypt jiffy
 LOCAL_DEPS = sasl
 SHELL_DEPS = sync
 TEST_DEPS = meck
-COVER ?= 1
 CT_OPTS ?= -create_priv_dir auto_per_tc
 
 dep_cowboy_commit = 2.0.0-pre.9
