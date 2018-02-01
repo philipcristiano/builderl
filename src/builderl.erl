@@ -57,8 +57,10 @@ build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepo}, Opts) ->
     ok = lager:debug("Build ~p", [{GitRepo, Path}]),
     BuilderlFile = Path ++ "/builderl.yml",
     IsDir = filelib:is_dir(Path),
-    clone_if_needed(IsDir, GitRepo, Path),
-
+    ok = case clone_if_needed(IsDir, GitRepo, Path) of
+        ok -> ok;
+        error -> builderl_build_registry:set_build_state(ID, clone_failed)
+    end,
     ok = case checkout_ref(Path, CommitIsh, BR) of
         ok -> ok;
         error -> builderl_build_registry:set_build_state(ID, checkout_failed),
@@ -69,11 +71,19 @@ build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepo}, Opts) ->
 
 clone_if_needed(false, GitRepo, Path) ->
     ok = lager:debug("Clone "),
-    {ok, _Text} = git:clone(GitRepo, Path),
+    case git:clone(GitRepo, Path) of
+      {ok, _Text} -> ok;
+      Error -> ok = lager:debug("Clone failed ~p", [Error]),
+             error
+    end,
     ok;
 clone_if_needed(true, _GitRepo, Path) ->
     ok = lager:debug("Fetch "),
-    {ok, _Test} = git:fetch(Path),
+    case git:fetch(Path) of
+      {ok, _Text} -> ok;
+      Error -> ok = lager:debug("Fetch failed ~p", [Error]),
+             error
+    end,
     ok.
 
 build_project(CWD, BuilderlFile, BR=#buildrecord{id=ID}) ->
