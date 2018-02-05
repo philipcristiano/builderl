@@ -103,6 +103,8 @@ Full example:
 ```
 
 Example Configuration
+
+```
 [{builderl, [
   {ssl, letsencrypt},
   {domain, "builderl.example.com"},
@@ -123,7 +125,7 @@ Example Configuration
   ]}
 ]}
 ].
-
+```
 
 ## Build Files
 
