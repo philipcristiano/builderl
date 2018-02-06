@@ -37,6 +37,9 @@ build(Name, GitRepo, Opts) ->
     CommitIsh = proplists:get_value(commit_ish, Opts, "master"),
 
     {ok, BuildID} = builderl_build_registry:create(Name, Ref, CommitIsh),
+    lager:info("Aboud to send info to Github"),
+    Resp = builderl_github:create_status(GitRepo, CommitIsh, pending, "Build starting", "builderl", "http://example.com"),
+    lager:info("Create_status ~p", [Resp]),
     BR=#buildrecord{id=BuildID,
                     project=Name,
                     repo=GitRepo,

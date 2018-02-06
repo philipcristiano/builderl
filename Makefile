@@ -2,7 +2,7 @@ PROJECT = builderl
 PROJECT_DESCRIPTION = New project
 PROJECT_VERSION = 0.1.0
 
-DEPS = cowboy erlgit sh jsx yamerl lager uuid erlydtl letsencrypt jiffy
+DEPS = cowboy erlgit sh jsx yamerl lager uuid erlydtl letsencrypt jiffy egithub
 LOCAL_DEPS = sasl
 SHELL_DEPS = sync
 TEST_DEPS = meck
@@ -20,6 +20,7 @@ dep_erlydtl = git https://github.com/philipcristiano/erlydtl.git master
 dep_letsencrypt = git https://github.com/philipcristiano/letsencrypt-erlang.git cacert-file
 # Get around ELFCLASS errors with older specified version
 dep_jiffy = git https://github.com/davisp/jiffy.git 0.14.11
+dep_egithub = git https://github.com/inaka/erlang-github.git 0.5.2
 
 dep_meck = git https://github.com/eproxus/meck.git 0.8.4
 
