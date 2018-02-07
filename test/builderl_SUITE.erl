@@ -21,6 +21,7 @@ groups() -> [{test_init,
 init_per_testcase(_, Config) ->
     ok = lager_common_test_backend:bounce(debug),
     application:set_env(builderl, builderl, global_env, [{"PATH", "/bin"}]),
+    application:set_env(builderl, domain, "test-domain"),
     application:ensure_all_started(yamerl),
     PrivDir = ?config(priv_dir, Config),
     {ok, _Pid} = builderl_build_registry:start_link(PrivDir),
