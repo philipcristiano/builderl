@@ -16,7 +16,8 @@ groups() -> [{test_init,
              [{create_priv_dir, auto_per_tc}],
              [aa_create_and_get_build,
               ab_create_and_list_builds,
-              ac_create_and_change_state]}].
+              ac_create_and_change_state,
+              ad_invalid_uuid]}].
 
 
 
@@ -84,4 +85,9 @@ ac_create_and_change_state(Config) ->
     ?assertEqual(Ref      , proplists:get_value(ref, Build2)),
     ?assertEqual(Commitish, proplists:get_value(commitish, Build2)),
 
+    ok.
+
+ad_invalid_uuid(_Config) ->
+    Resp = ?MUT:get_build("unknown", "1234"),
+    ?assertEqual({error, invalid_uuid}, Resp),
     ok.

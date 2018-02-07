@@ -11,12 +11,16 @@ init(Req0=#{method := <<"GET">>}, State) ->
     ok = lager:info("Org/Repo ~p/~p", [Org, Repo]),
     Project = string:join([binary:bin_to_list(Org), binary:bin_to_list(Repo)], "/"),
     ok = lager:info("build ~p", [BuildID]),
-    {ok, Objects} = builderl_build_registry:get_build(Project, BuildID),
-    {ok, Logs} = builderl:get_build_logs(Project, BuildID),
-    ok = lager:info("Objects ~p", [Objects]),
-    _Data = jsx:encode(#{logs => Logs}),
-    Reply = cowboy_req:reply(200,
-        #{<<"content-type">> => <<"text/plain">>},
-        Logs,
-        Req0),
-    {ok, Reply, State}.
+
+    case builderl_build_registry:get_build(Project, BuildID) of
+      {ok, Objects} -> {ok, Logs} = builderl:get_build_logs(Project, BuildID),
+                       ok = lager:info("Objects ~p", [Objects]),
+                       _Data = jsx:encode(#{logs => Logs}),
+                       Reply = cowboy_req:reply(200,
+                                                #{<<"content-type">> => <<"text/plain">>},
+                                                Logs,
+                                                Req0),
+                       {ok, Reply, State};
+      {error, invalid_uuid} -> Reply = cowboy_req:reply(404, #{}, <<"">>, Req0),
+                               {ok, Reply, State}
+    end.
