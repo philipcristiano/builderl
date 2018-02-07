@@ -32,24 +32,22 @@ get_project_config_value(BProject, Key) when is_binary(BProject) ->
     Config = proplists:get_value(Project, Projects, []),
     proplists:get_value(Key, Config, undefined).
 
-build(Name, GitRepo, Opts) ->
+build(Name, GitRepoURL, Opts) ->
     Ref = proplists:get_value(ref, Opts, "refs/heads/master"),
     CommitIsh = proplists:get_value(commit_ish, Opts, "master"),
 
     {ok, BuildID} = builderl_build_registry:create(Name, Ref, CommitIsh),
-    lager:info("Aboud to send info to Github"),
-    Resp = builderl_github:create_status(GitRepo, CommitIsh, pending, "Build starting", "builderl", "http://example.com"),
-    lager:info("Create_status ~p", [Resp]),
     BR=#buildrecord{id=BuildID,
                     project=Name,
-                    repo=GitRepo,
+                    repo=GitRepoURL,
                     committish=CommitIsh,
                     ref=Ref},
+    set_github_status(pending, BR),
     SpawnFun = proplists:get_value(spawn_fun, Opts, fun erlang:spawn/3),
     SpawnFun(builderl, build_proc, [BR, Opts]),
     {ok, BuildID}.
 
-build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepo}, Opts) ->
+build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepoURL}, Opts) ->
     ok = lager:debug("Commit-ish ~p", [CommitIsh]),
     Time = erlang:monotonic_time(seconds),
 
@@ -57,10 +55,10 @@ build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepo}, Opts) ->
     BuildDir = application:get_env(builderl, builds_directory, BuildDirArg),
 
     Path = BuildDir ++ "/" ++ lists:flatten(io_lib:format("build~p",[Time])),
-    ok = lager:debug("Build ~p", [{GitRepo, Path}]),
+    ok = lager:debug("Build ~p", [{GitRepoURL, Path}]),
     BuilderlFile = Path ++ "/builderl.yml",
     IsDir = filelib:is_dir(Path),
-    ok = case clone_if_needed(IsDir, GitRepo, Path) of
+    ok = case clone_if_needed(IsDir, GitRepoURL, Path) of
         ok -> ok;
         error -> builderl_build_registry:set_build_state(ID, clone_failed)
     end,
@@ -72,9 +70,9 @@ build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepo}, Opts) ->
     build_project(Path, BuilderlFile, BR),
     ok.
 
-clone_if_needed(false, GitRepo, Path) ->
+clone_if_needed(false, GitRepoURL, Path) ->
     ok = lager:debug("Clone "),
-    case git:clone(GitRepo, Path) of
+    case git:clone(GitRepoURL, Path) of
       {ok, _Text} -> ok;
       Error -> ok = lager:debug("Clone failed ~p", [Error]),
              error
@@ -121,7 +119,8 @@ execute_stages([Stage|Stages], Dir, BR=#buildrecord{ref=Ref}, BuildFileEnv) ->
                              BuildFileEnv);
         _ -> ok
     end;
-execute_stages([], _Dir, #buildrecord{id=ID}, _BuildFileEnv) ->
+execute_stages([], _Dir, BR=#buildrecord{id=ID}, _BuildFileEnv) ->
+    set_github_status(success, BR),
     builderl_build_registry:set_build_state(ID, successful).
 
 short_ref(Ref) ->
@@ -155,7 +154,8 @@ execute_steps([Step|Steps], Dir, BR=#buildrecord{id=ID}, BuildFileEnv) ->
                            Dir,
                            BR#buildrecord{step_count=BR#buildrecord.step_count + 1},
                            BuildFileEnv);
-        _ -> ok = builderl_build_registry:set_build_state(ID, failed),
+        _ -> set_github_status(failure, BR),
+             ok = builderl_build_registry:set_build_state(ID, failed),
              ok = lager:debug("Step exited non-zero"),
              error
     end;
@@ -246,3 +246,17 @@ proplist_is_strings([{_Key, Value}| L]) when is_list(Value) ->
     proplist_is_strings(L);
 proplist_is_strings(_)  ->
     false.
+
+
+set_github_status(pending, BR) ->
+    set_github_status(pending, "Build pending", BR);
+set_github_status(success, BR) ->
+    set_github_status(success, "Build successful", BR);
+set_github_status(failure, BR) ->
+    set_github_status(failure, "Build Failure", BR).
+
+set_github_status(Status, Message, #buildrecord{project=Name, committish=CommitIsh}) ->
+    lager:info("About to send info to Github"),
+    Resp = builderl_github:create_status(Name, CommitIsh, Status, Message, "builderl", "http://example.com"),
+    lager:info("Create_status response ~p", [Resp]),
+    Resp.
