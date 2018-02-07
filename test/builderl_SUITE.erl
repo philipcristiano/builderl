@@ -24,7 +24,7 @@ init_per_testcase(_, Config) ->
     application:ensure_all_started(yamerl),
     PrivDir = ?config(priv_dir, Config),
     {ok, _Pid} = builderl_build_registry:start_link(PrivDir),
-    ok = meck:new(builderl_github, [unstick]),
+    ok = meck:new(builderl_github, []),
     % lager:debug("CT Config ~p", [Config]),
 
     % ok = meck:new(erlcloud_aws, []),
