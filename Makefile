@@ -22,7 +22,7 @@ dep_letsencrypt = git https://github.com/philipcristiano/letsencrypt-erlang.git 
 dep_jiffy = git https://github.com/davisp/jiffy.git 0.14.11
 dep_egithub = git https://github.com/inaka/erlang-github.git 0.5.2
 
-dep_meck = git https://github.com/eproxus/meck.git 0.8.4
+dep_meck = git https://github.com/eproxus/meck.git 0.8.9
 
 DEP_PLUGINS = cowboy
 
