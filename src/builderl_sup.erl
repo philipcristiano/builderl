@@ -13,6 +13,10 @@ init([]) ->
   Procs = [
         #{id    => builderl_build_registry,
           start => {builderl_build_registry, start_link, [FileBase]}
+        },
+        #{
+          id    => builderl_github,
+          start => {builderl_github, start_link, []}
         }
     ],
   {ok, {{one_for_one, 1, 5}, Procs}}.

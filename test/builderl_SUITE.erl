@@ -24,15 +24,16 @@ init_per_testcase(_, Config) ->
     application:ensure_all_started(yamerl),
     PrivDir = ?config(priv_dir, Config),
     {ok, _Pid} = builderl_build_registry:start_link(PrivDir),
+    ok = meck:new(builderl_github, []),
     % lager:debug("CT Config ~p", [Config]),
 
-    % ok = meck:new(erlcloud_s3, []),
     % ok = meck:new(erlcloud_aws, []),
     % ok = meck:new(sssftp_user_session, []),
     % Contents = [
     %     [{key, "uploads/USER/file.txt"},
     %      {content_length, 1024}]],
 
+    ok = meck:expect(builderl_github, create_status, fun(_,_,_,_,_,_) -> ok end),
     % ok = meck:expect(erlcloud_s3, list_objects, fun(_, _, _) -> [{contents, Contents}] end),
     % ok = meck:expect(erlcloud_aws, auto_config, fun() -> {ok, autoconfig} end),
     % ok = meck:expect(sssftp_user_session, get, fun(user_auth_server, _) -> {ok, "USER"} end),
@@ -46,7 +47,7 @@ init_per_testcase(_, Config) ->
     Config.
 
 end_per_testcase(_, Config) ->
-    % ok = meck:unload(erlcloud_s3),
+    ok = meck:unload(builderl_github),
     % ok = meck:unload(sssftp_user_session),
     Config.
 

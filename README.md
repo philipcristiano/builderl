@@ -99,10 +99,18 @@ Full example:
 `domain` - Domain that resolves to the server location. Used for Lets Encrypt SSL setup and redirects for incorrect hosts (http -> https when SSL is used).
 
 ```
-[{builder, [{domain, "builderl.example.com"}]}].
+[{builderl, [{domain, "builderl.example.com"}]}].
+```
+
+`github_credentials` - Username and password for an API user on Github.
+
+```
+[{builderl, [{github_credentials, {"Username", "password}}]}]
 ```
 
 Example Configuration
+
+```
 [{builderl, [
   {ssl, letsencrypt},
   {domain, "builderl.example.com"},
@@ -123,7 +131,7 @@ Example Configuration
   ]}
 ]}
 ].
-
+```
 
 ## Build Files
 
