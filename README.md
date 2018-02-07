@@ -105,7 +105,7 @@ Full example:
 `github_credentials` - Username and password for an API user on Github.
 
 ```
-[{builderl, [{github_credentials, {"Username", "password}}]}].
+[{builderl, [{github_credentials, {"Username", "password}}]}]
 ```
 
 Example Configuration
