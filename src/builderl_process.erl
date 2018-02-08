@@ -20,7 +20,7 @@ run(Command, Dir, Env, Func) ->
          {args, Args}, {cd, Dir}, {env, Env}]),
     ok = lager:debug("Port started, entering IO loop"),
     Status = loop(Port, Func),
-    ok = lager:debug("Status ~p",[Status]),
+    ok = lager:debug("Status ~p", [Status]),
     Status.
 
 loop(Port, Fun) ->

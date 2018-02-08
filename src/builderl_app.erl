@@ -17,10 +17,10 @@ start(_Type, _Args) ->
         _ -> setup_cowboy_http()
     end,
 
-	  builderl_sup:start_link().
+    builderl_sup:start_link().
 
 stop(_State) ->
-	  ok.
+    ok.
 
 setup_cowboy_with_letsencrypt() ->
     Dispatch = cowboy_router:compile([{'_', acme_routes() ++ https_redirect_routes()}]),
@@ -73,7 +73,7 @@ start_letsencrypt() ->
 
     CertProps = case should_update_cert(CertFile) of
         true -> BDomain = binary:list_to_bin(Domain),
-                {ok, _Pid} = letsencrypt:start([{mode,slave}, {cert_path, CertDir}]),
+                {ok, _Pid} = letsencrypt:start([{mode, slave}, {cert_path, CertDir}]),
                 MC = letsencrypt:make_cert(BDomain, #{async => false}),
                 {ok, CertMap} = MC,
                 ok = lager:info("Lets Encrypt ~p", [MC]),
@@ -91,7 +91,7 @@ should_update_cert(Path) ->
     File = file:read_file(Path),
     should_update_cert_from_file(File).
 
-should_update_cert_from_file({error,enoent}) ->
+should_update_cert_from_file({error, enoent}) ->
     true;
 should_update_cert_from_file({ok, File}) ->
     [Cert1| _] = public_key:pem_decode(File),
@@ -114,7 +114,4 @@ should_update_cert_from_file({ok, File}) ->
     DaysUntilToday = calendar:date_to_gregorian_days(Today),
     DaysRemaining =  ValidUntilDay - DaysUntilToday,
 
-    if DaysRemaining < 31 -> true;
-       true               -> false
-    end.
-
+    DaysRemaining < 31.

@@ -28,7 +28,7 @@
 
 -spec start_link(atom()) -> {ok, pid()}.
 start_link(FileBase) ->
-	  gen_server:start_link({local, ?MODULE}, ?MODULE, [FileBase], []).
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [FileBase], []).
 
 -spec create(nonempty_list(), nonempty_list(), nonempty_list()) -> {ok, nonempty_list()}.
 create(Project, Ref, Commitish) ->
@@ -60,7 +60,7 @@ init([FileBase]) ->
     {ok, _Name} = dets:open_file(?TABLE, [{type, set},
                                           {keypos, #builderl_build_record.id},
                                           {file, Filename}]),
-	{ok, #state{}}.
+  {ok, #state{}}.
 
 handle_call({create, {Project, Ref, Commitish}}, _From, State) ->
     ID = uuid:uuid4(),
@@ -75,7 +75,7 @@ handle_call({create, {Project, Ref, Commitish}}, _From, State) ->
                                     time=Time},
     ok = dets:insert(?TABLE, Record),
     ok = dets:sync(?TABLE),
-	  {reply, {ok, SID}, State};
+    {reply, {ok, SID}, State};
 
 handle_call({get_builds, Project}, _From, State) ->
     Match = ets:fun2ms(
@@ -85,14 +85,14 @@ handle_call({get_builds, Project}, _From, State) ->
 
     Objects = dets:select(?TABLE, Match),
     Builds = builds_to_proplist(Objects),
-	  {reply, {ok, Builds}, State};
+    {reply, {ok, Builds}, State};
 
 handle_call({get_build, _Project, ID}, _From, State) ->
     BID = uuid:to_binary(ID),
     ok = lager:debug("ID ~p~n", [{BID, ID}]),
     Objects = dets:lookup(?TABLE, BID),
     [Builds] = builds_to_proplist(Objects),
-	  {reply, {ok, Builds}, State};
+    {reply, {ok, Builds}, State};
 
 handle_call({set_build_state, ID, BRState}, _From, State) ->
     BID = uuid:to_binary(ID),
@@ -105,7 +105,7 @@ handle_call({set_build_state, ID, BRState}, _From, State) ->
     {reply, ok, State};
 
 handle_call(_Request, _From, State) ->
-	  {reply, ignored, State}.
+    {reply, ignored, State}.
 
 builds_to_proplist([{Project, ID, Ref, Commitish, Time}|Rest]) ->
     [[{id, uuid:to_string(simple, ID)},
@@ -125,13 +125,13 @@ builds_to_proplist([]) ->
     [].
 
 handle_cast(_Msg, State) ->
-	{noreply, State}.
+  {noreply, State}.
 
 handle_info(_Info, State) ->
-	{noreply, State}.
+  {noreply, State}.
 
 terminate(_Reason, _State) ->
-	ok.
+  ok.
 
 code_change(_OldVsn, State, _Extra) ->
-	{ok, State}.
+  {ok, State}.
