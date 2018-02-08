@@ -3,6 +3,7 @@ PROJECT_DESCRIPTION = New project
 PROJECT_VERSION = 0.1.0
 
 DEPS = cowboy erlgit sh jsx yamerl lager uuid erlydtl letsencrypt jiffy egithub
+BUILD_DEPS = elvis_mk
 LOCAL_DEPS = sasl
 SHELL_DEPS = sync
 TEST_DEPS = meck
@@ -22,9 +23,10 @@ dep_letsencrypt = git https://github.com/philipcristiano/letsencrypt-erlang.git 
 dep_jiffy = git https://github.com/davisp/jiffy.git 0.14.11
 dep_egithub = git https://github.com/inaka/erlang-github.git 0.5.2
 
+dep_elvis_mk = git https://github.com/inaka/elvis.mk.git 1.0.0
 dep_meck = git https://github.com/eproxus/meck.git 0.8.9
 
-DEP_PLUGINS = cowboy
+DEP_PLUGINS = cowboy elvis_mk
 
 SHELL_OPTS = -eval 'application:ensure_all_started(builderl), sync:go().' -config sys
 DTL_OPTS = force_recompile, {libraries, [{builderl_filters, builderl_dtl_filters}]}, {default_libraries, [builderl_filters]}
