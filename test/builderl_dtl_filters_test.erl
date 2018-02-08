@@ -18,12 +18,12 @@ inventory_test() ->
     FI = ?MUT:inventory(filters),
     TI = ?MUT:inventory(tags),
 
-    ?assertEqual([sToDatetime], FI),
+    ?assertEqual([s_to_datetime], FI),
     ?assertEqual([], TI).
 
 
-sToDatetime_test() ->
+s_to_datetime_test() ->
     Seconds = 100,
-    Date = ?MUT:sToDatetime(Seconds),
+    Date = ?MUT:s_to_datetime(Seconds),
     ExpectedDate = ["1970","-","1","-","1"," ","0",":","1",":","40"],
     ?assertEqual(ExpectedDate, Date).

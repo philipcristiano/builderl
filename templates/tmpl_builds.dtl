@@ -6,7 +6,7 @@
 
 {% block body %}
 {% for build in builds %}
-  <span>{{ build.time | sToDatetime }}</span> - {{ build.ref }} -
+  <span>{{ build.time | s_to_datetime }}</span> - {{ build.ref }} -
   <a href="/builds/{{ project }}/{{ build.id }}">{{build.commitish}} {{build.id}}</a> - {{ build.state | default:"unknown"}}<br />
 {% endfor %}
 

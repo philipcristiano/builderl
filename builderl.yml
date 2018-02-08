@@ -17,6 +17,7 @@ stages:
       - pwd
       - make deps app
       - make tests
+      - make elvis
       # - make dialyze
       - make package
 

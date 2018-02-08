@@ -54,7 +54,7 @@ build_proc(BR=#buildrecord{id=ID, committish=CommitIsh, repo=GitRepoURL}, Opts) 
     BuildDirArg = proplists:get_value(builds_directory, Opts, "/tmp"),
     BuildDir = application:get_env(builderl, builds_directory, BuildDirArg),
 
-    Path = BuildDir ++ "/" ++ lists:flatten(io_lib:format("build~p",[Time])),
+    Path = BuildDir ++ "/" ++ lists:flatten(io_lib:format("build~p", [Time])),
     ok = lager:debug("Build ~p", [{GitRepoURL, Path}]),
     BuilderlFile = Path ++ "/builderl.yml",
     IsDir = filelib:is_dir(Path),
@@ -217,7 +217,7 @@ get_env_from_br(#buildrecord{id=BuildId, project=Name, committish=C, ref=Ref}) -
      {"BUILDERL_REF", Ref}].
 
 merge_env(Env1, Env2) ->
-    orddict:merge(fun(_,_X,Y) -> Y end, orddict:from_list(Env1), orddict:from_list(Env2)).
+    orddict:merge(fun(_, _X, Y) -> Y end, orddict:from_list(Env1), orddict:from_list(Env2)).
 
 get_global_env() ->
     Config = application:get_env(builderl, global_env, []),

@@ -5,22 +5,22 @@
 -export([version/0,
          inventory/1]).
 
--export([sToDatetime/1]).
+-export([s_to_datetime/1]).
 
 version() ->
   1.
 
 inventory(filters) ->
-  [sToDatetime];
+  [s_to_datetime];
 inventory(tags) ->
   [].
 
 
-sToDatetime(Seconds) when is_integer(Seconds)->
-    {Date, Time} = secondsToDateAndTime(Seconds),
-    formatDate(Date, Time).
+s_to_datetime(Seconds) when is_integer(Seconds)->
+    {Date, Time} = seconds_to_date_and_time(Seconds),
+    format_date(Date, Time).
 
-formatDate({Y, Mo, D}, {H, Mi, S}) ->
+format_date({Y, Mo, D}, {H, Mi, S}) ->
     [integer_to_list(Y), "-",
      integer_to_list(Mo), "-",
      integer_to_list(D), " ",
@@ -29,8 +29,8 @@ formatDate({Y, Mo, D}, {H, Mi, S}) ->
      integer_to_list(S)].
 
 
-secondsToDateAndTime(TotalSeconds) ->
-    BaseDate      = calendar:datetime_to_gregorian_seconds({{1970,1,1},{0,0,0}}),
+seconds_to_date_and_time(TotalSeconds) ->
+    BaseDate      = calendar:datetime_to_gregorian_seconds({{1970, 1, 1}, {0, 0, 0}}),
     Seconds       = BaseDate + TotalSeconds,
     {Date, Time} = calendar:gregorian_seconds_to_datetime(Seconds),
     {Date, Time}.
