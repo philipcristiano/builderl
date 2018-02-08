@@ -39,8 +39,13 @@ get_builds(Project) when is_list(Project) ->
     gen_server:call(?MODULE, {get_builds, Project}).
 
 -spec get_build(nonempty_list(), nonempty_list()) -> {ok, nonempty_list()}.
-get_build(Project, ID) when is_list(ID)->
-    gen_server:call(?MODULE, {get_build, Project, ID}).
+get_build(Project, ID) when is_list(ID) ->
+    try uuid:is_valid(ID) of
+      true -> gen_server:call(?MODULE, {get_build, Project, ID});
+      _ -> {error, invalid_uuid}
+    catch
+      error:badarg -> {error, invalid_uuid}
+    end.
 
 -spec set_build_state(nonempty_list(), atom()) -> ok.
 set_build_state(ID, State) ->

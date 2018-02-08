@@ -255,8 +255,12 @@ set_github_status(success, BR) ->
 set_github_status(failure, BR) ->
     set_github_status(failure, "Build Failure", BR).
 
-set_github_status(Status, Message, #buildrecord{project=Name, committish=CommitIsh}) ->
+set_github_status(Status, Message, #buildrecord{id=ID, project=Name, committish=CommitIsh}) ->
+    {ok, Domain} = application:get_env(builderl, domain),
+
+    URL = lists:flatten(["http://", Domain, "/builds/", Name, "/", ID]),
+
     lager:info("About to send info to Github"),
-    Resp = builderl_github:create_status(Name, CommitIsh, Status, Message, "builderl", "http://example.com"),
+    Resp = builderl_github:create_status(Name, CommitIsh, Status, Message, "builderl", URL),
     lager:info("Create_status response ~p", [Resp]),
     Resp.
