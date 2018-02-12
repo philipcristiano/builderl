@@ -9,8 +9,18 @@
     <script src="/static/script.js"></script>
   </head>
   <body>
-    {% block body %}
+  <div class="container">
+    <div class="row">
+      <div class="col-2">
+        <h2>Builderl</h2>
+        <a href="/projects">Projects</a>
+      </div>
 
-    {% endblock %}
+      <div class="col-10">
+      {% block body %}
+      {% endblock %}
+      </div>
+    </div>
+  </div>
   </body>
 </html>
