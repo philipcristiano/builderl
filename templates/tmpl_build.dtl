@@ -1,0 +1,18 @@
+{% extends 'tmpl_base.dtl' %}
+{% load builderl_dtl_filters %}
+
+
+{% block title %}{{ project }} at Buildlerl {% endblock %}
+
+{% block body %}
+<div class="row">
+  <pre><code>
+
+  {% for line in logs %}{{ line }}
+  {% endfor %}
+
+  </code></pre>
+
+</div>
+
+{% endblock %}

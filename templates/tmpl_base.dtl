@@ -1,14 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- Required meta tags -->
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}Builderl{% endblock %}</title>
-    <link rel="stylesheet" href="/style.css">
-    <script src="/script.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js"></script>
   </head>
   <body>
-    {% block body %}
+  <div class="container">
+    <div class="row">
+      <div class="col-2">
+        <h2>Builderl</h2>
+        <a href="/projects">Projects</a>
+      </div>
 
-    {% endblock %}
+      <div class="col-10">
+      {% block body %}
+      {% endblock %}
+      </div>
+    </div>
+  </div>
   </body>
 </html>

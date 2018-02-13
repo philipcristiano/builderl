@@ -54,7 +54,8 @@ start_tls(Routes, Certs) ->
     ok.
 
 builderl_routes() ->
-    [{"/webhooks/github", builderl_github_webhook, builderl_github_webhook:state_init()},
+    [{"/static/[...]", cowboy_static, {priv_dir, builderl, "static"}},
+     {"/webhooks/github", builderl_github_webhook, builderl_github_webhook:state_init()},
      {"/projects", builderl_projects_handler, builderl_projects_handler:state_init()},
      {"/builds/:org/:repo", builderl_builds_handler, []},
      {"/builds/:org/:repo/:build", builderl_build_handler, []}].

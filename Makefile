@@ -31,6 +31,24 @@ DEP_PLUGINS = cowboy elvis_mk
 SHELL_OPTS = -eval 'application:ensure_all_started(builderl), sync:go().' -config sys
 DTL_OPTS = force_recompile, {libraries, [{builderl_filters, builderl_dtl_filters}]}, {default_libraries, [builderl_filters]}
 
+script_modules = static/scripts/jquery-3.3.1.js \
+							   static/scripts/bootstrap.bundle.js \
+								 static/scripts/builderl.js
+style_modules = static/styles/bootstrap-4.0.0.css
+
+priv/static:
+	mkdir -p priv/static
+
+priv/static/script.js: ${script_modules}
+	cat $^ > $@
+
+priv/static/style.css: ${style_modules}
+	cat $^ > $@
+
+.PHONY: static
+static: priv/static priv/static/script.js priv/static/style.css
+	@echo 'DONE'
+
 # OmniOS build/packaging
 BUILDDIR = build
 BUILDTMP = tmp
