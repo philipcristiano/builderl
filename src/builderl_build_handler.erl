@@ -14,11 +14,14 @@ init(Req0=#{method := <<"GET">>}, State) ->
 
     case builderl_build_registry:get_build(Project, BuildID) of
       {ok, Objects} -> {ok, Logs} = builderl:get_build_logs(Project, BuildID),
+                       SplitLogs = binary:split(Logs, <<"\n">>, [global]),
                        ok = lager:info("Objects ~p", [Objects]),
                        _Data = jsx:encode(#{logs => Logs}),
+                       {ok, Data} = tmpl_build_dtl:render([{logs, SplitLogs},
+                                                           {project, Project}]),
                        Reply = cowboy_req:reply(200,
-                                                #{<<"content-type">> => <<"text/plain">>},
-                                                Logs,
+                                                #{<<"content-type">> => <<"text/html">>},
+                                                Data,
                                                 Req0),
                        {ok, Reply, State};
       {error, invalid_uuid} -> Reply = cowboy_req:reply(404, #{}, <<"">>, Req0),
