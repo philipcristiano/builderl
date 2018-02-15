@@ -20,6 +20,7 @@ stages:
       - make elvis
       # - make dialyze
       - make package
+      - make ips-package
 
   - name: publish
     match: "^master$"
