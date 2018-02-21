@@ -7,8 +7,9 @@
 -export([build_ids/1]).
 
 init(Req0=#{method := <<"GET">>}, State) ->
-    Org = cowboy_req:binding(org, Req0),
-    Repo = cowboy_req:binding(repo, Req0),
+    {_Cookies, Req1} = builderl_sessions:request_start(Req0),
+    Org = cowboy_req:binding(org, Req1),
+    Repo = cowboy_req:binding(repo, Req1),
     ok = lager:info("Org/Repo ~p/~p", [Org, Repo]),
     Project = string:join([binary:bin_to_list(Org), binary:bin_to_list(Repo)], "/"),
     {ok, Builds} = builderl_build_registry:get_builds(Project),
@@ -21,7 +22,7 @@ init(Req0=#{method := <<"GET">>}, State) ->
     Reply = cowboy_req:reply(200,
         #{<<"content-type">> => <<"text/html">>},
         Data,
-        Req0),
+        Req1),
     {ok, Reply, State}.
 
 build_ids([H|T]) ->

@@ -10,6 +10,7 @@ state_init() ->
     [{projects, Projects}].
 
 init(Req0=#{method := <<"GET">>}, State) ->
+    {_Cookies, Req1} = builderl_sessions:request_start(Req0),
     Projects = proplists:get_value(projects, State),
     ok = lager:info("projects ~p", [Projects]),
 
@@ -18,5 +19,5 @@ init(Req0=#{method := <<"GET">>}, State) ->
     Reply = cowboy_req:reply(200,
         #{<<"content-type">> => <<"text/html">>},
         Data,
-        Req0),
+        Req1),
     {ok, Reply, State}.
