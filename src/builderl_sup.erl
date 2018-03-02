@@ -17,6 +17,9 @@ init([]) ->
         #{
           id    => builderl_github,
           start => {builderl_github, start_link, []}
+        },
+        #{id    => builderl_ets_session_store,
+          start => {builderl_ets_session_store, start_link, []}
         }
     ],
   {ok, {{one_for_one, 1, 5}, Procs}}.

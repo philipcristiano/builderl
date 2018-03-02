@@ -2,7 +2,7 @@ PROJECT = builderl
 PROJECT_DESCRIPTION = New project
 PROJECT_VERSION = 0.1.0
 
-DEPS = cowboy erlgit sh jsx yamerl lager uuid erlydtl letsencrypt jiffy egithub
+DEPS = cowboy erlgit sh jsx yamerl lager uuid erlydtl letsencrypt jiffy egithub urilib hackney
 BUILD_DEPS = elvis_mk
 LOCAL_DEPS = sasl
 SHELL_DEPS = sync
@@ -14,9 +14,11 @@ IPS_DEPS = pkg:/developer/versioning/git \
 
 dep_cowboy_commit = 2.0.0-pre.9
 dep_erlgit = git https://github.com/gleber/erlgit v0.7.5
+dep_hackney = git https://github.com/benoitc/hackney.git 1.11.0
 dep_sh = git https://github.com/gleber/sh.git master
 dep_sync = git https://github.com/rustyio/sync.git master
 dep_jsx = git https://github.com/talentdeficit/jsx.git v2.8.2
+dep_oauth2_client = git https://github.com/kivra/oauth2_client.git 1.0.1
 dep_yamerl = git https://github.com/yakaz/yamerl.git v0.4.0
 dep_lager = git https://github.com/erlang-lager/lager.git 3.4.1
 dep_uuid = git https://github.com/avtobiff/erlang-uuid.git v0.5.1
@@ -25,6 +27,7 @@ dep_letsencrypt = git https://github.com/philipcristiano/letsencrypt-erlang.git 
 # Get around ELFCLASS errors with older specified version
 dep_jiffy = git https://github.com/davisp/jiffy.git 0.14.11
 dep_egithub = git https://github.com/inaka/erlang-github.git 0.5.2
+dep_urilib = git https://github.com/gmr/urilib.git 0.3.0
 
 dep_elvis_mk = git https://github.com/inaka/elvis.mk.git 1.0.0
 dep_meck = git https://github.com/eproxus/meck.git 0.8.9

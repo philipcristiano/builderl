@@ -3,6 +3,7 @@
 
 -export([request_start/1,
          get_value/2,
+         get_value/3,
          set_value/3]).
 
 -define(STORAGE, builderl_ets_session_store).
@@ -19,8 +20,12 @@ set_value(Key, Value, Cookies) ->
     ?STORAGE:set_value(Key, Value, SID).
 
 get_value(Key, Cookies) ->
-    SID = proplists:get_value(?SESSION_KEY, Cookies),
-    ?STORAGE:get_value(Key, SID).
+    get_value(Key, Cookies, undefined).
+
+get_value(Key, Cookies, Default) ->
+    SID = proplists:get_value(?SESSION_KEY, Cookies, Default),
+    ?STORAGE:get_value(Key, SID, Default).
+
 
 init_cookies([], Req) ->
     ID = uuid:uuid4(),

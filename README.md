@@ -108,12 +108,20 @@ Full example:
 [{builderl, [{github_credentials, {"Username", "password}}]}]
 ```
 
+`github_oauth_app_credentials` - Client ID and secret for OAuth Login
+
+```
+[{builderl, [{github_oauth_app_credentials, {"Client ID", "Secret}}]}]
+```
+
 Example Configuration
 
 ```
 [{builderl, [
   {ssl, letsencrypt},
   {domain, "builderl.example.com"},
+  {github_credentials, {"Username", "password"}},
+  {github_oauth_app_credentials, {"Client ID", "Secret"}},
   {http_port, 80},
   {projects, [{"philipcristiano/builderl", [
                 {github_webhook_secret, "$SECRET"}

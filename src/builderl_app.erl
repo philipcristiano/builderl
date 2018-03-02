@@ -56,6 +56,8 @@ start_tls(Routes, Certs) ->
 builderl_routes() ->
     [{"/static/[...]", cowboy_static, {priv_dir, builderl, "static"}},
      {"/webhooks/github", builderl_github_webhook, builderl_github_webhook:state_init()},
+     {"/github_login", builderl_github_login_handler, []},
+     {"/gh-auth", builderl_github_auth_handler, []},
      {"/projects", builderl_projects_handler, builderl_projects_handler:state_init()},
      {"/builds/:org/:repo", builderl_builds_handler, []},
      {"/builds/:org/:repo/:build", builderl_build_handler, []}].
@@ -83,7 +85,7 @@ start_letsencrypt() ->
                  {keyfile, binary:bin_to_list(maps:get(key, CertMap))}];
         false -> [{certfile, CertDir ++ "/" ++ Domain ++ ".crt"},
                   {cacertfile, CertDir ++ "/" ++ Domain ++ ".ca.crt"},
-                 {keyfile, CertDir ++ "/" ++ Domain ++ ".key"}]
+                  {keyfile, CertDir ++ "/" ++ Domain ++ ".key"}]
     end,
 
     CertProps.
