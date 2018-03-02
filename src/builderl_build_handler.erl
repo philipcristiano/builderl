@@ -5,7 +5,7 @@
 -export([init/2]).
 
 init(Req0=#{method := <<"GET">>}, State) ->
-    {_Cookies, Req1} = builderl_sessions:request_start(Req0),
+    {Cookies, Req1} = builderl_sessions:request_start(Req0),
     Org = cowboy_req:binding(org, Req1),
     Repo = cowboy_req:binding(repo, Req1),
     BuildID = binary:bin_to_list(cowboy_req:binding(build, Req1)),
@@ -18,8 +18,10 @@ init(Req0=#{method := <<"GET">>}, State) ->
                        SplitLogs = binary:split(Logs, <<"\n">>, [global]),
                        ok = lager:info("Objects ~p", [Objects]),
                        _Data = jsx:encode(#{logs => Logs}),
-                       {ok, Data} = tmpl_build_dtl:render([{logs, SplitLogs},
-                                                           {project, Project}]),
+                       {ok, Data} = builderl_http:render(
+                                      tmpl_build_dtl,
+                                      [{logs, SplitLogs}, {project, Project}],
+                                      Cookies),
                        Reply = cowboy_req:reply(200,
                                                 #{<<"content-type">> => <<"text/html">>},
                                                 Data,
