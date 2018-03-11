@@ -5,12 +5,13 @@
 -export([init/2]).
 
 init(Req0, State) ->
+    {_Cookies, Req1} = builderl_sessions:request_start(Req0),
     Domain = proplists:get_value(domain, State),
-    Path = binary:bin_to_list(cowboy_req:path(Req0)),
+    Path = binary:bin_to_list(cowboy_req:path(Req1)),
     NewLocation = "https://" ++ Domain ++ Path,
     BinLocation = binary:list_to_bin(NewLocation),
     Req1 = cowboy_req:reply(302,
                             #{<<"Location">> => BinLocation},
                             <<>>,
-                            Req0),
+                            Req1),
     {halt, Req1, State}.

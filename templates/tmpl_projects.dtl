@@ -1,8 +1,12 @@
 {% extends 'tmpl_base.dtl' %}
 
 {% block body %}
+  <table class="table">
+  <tbody>
 {% for project in projects %}
-  <a href="/builds/{{ project }}">{{project}}</a><br />
+  <tr><th scope="row"><a href="/builds/{{ project }}">{{project}}</a></th></tr>
 {% endfor %}
+  </tbody>
+  </table>
 
 {% endblock %}

@@ -17,7 +17,7 @@
 ERLANG_MK_FILENAME := $(realpath $(lastword $(MAKEFILE_LIST)))
 export ERLANG_MK_FILENAME
 
-ERLANG_MK_VERSION = 2017.08.28-25-g75e9daa
+ERLANG_MK_VERSION = 2018.03.05
 ERLANG_MK_WITHOUT = 
 
 # Make 3.81 and 3.82 are deprecated.
@@ -4474,11 +4474,33 @@ define dep_autopatch_rebar.erl
 		end,
 		Write("\n")
 	end(),
+	GetHexVsn = fun(N) ->
+		case file:consult("$(call core_native_path,$(DEPS_DIR)/$1/rebar.lock)") of
+			{ok, Lock} ->
+				io:format("~p~n", [Lock]),
+				case lists:keyfind("1.1.0", 1, Lock) of
+					{_, LockPkgs} ->
+						io:format("~p~n", [LockPkgs]),
+						case lists:keyfind(atom_to_binary(N, latin1), 1, LockPkgs) of
+							{_, {pkg, _, Vsn}, _} ->
+								io:format("~p~n", [Vsn]),
+								{N, {hex, binary_to_list(Vsn)}};
+							_ ->
+								false
+						end;
+					_ ->
+						false
+				end;
+			_ ->
+				false
+		end
+	end,
 	fun() ->
 		File = case lists:keyfind(deps, 1, Conf) of
 			false -> [];
 			{_, Deps} ->
 				[begin case case Dep of
+							N when is_atom(N) -> GetHexVsn(N);
 							{N, S} when is_atom(N), is_list(S) -> {N, {hex, S}};
 							{N, S} when is_tuple(S) -> {N, S};
 							{N, _, S} -> {N, S};
@@ -4685,7 +4707,10 @@ define dep_autopatch_appsrc_script.erl
 	Bindings0 = erl_eval:new_bindings(),
 	Bindings1 = erl_eval:add_binding('CONFIG', Conf0, Bindings0),
 	Bindings = erl_eval:add_binding('SCRIPT', AppSrcScript, Bindings1),
-	{ok, [Conf]} = file:script(AppSrcScript, Bindings),
+	Conf = case file:script(AppSrcScript, Bindings) of
+		{ok, [C]} -> C;
+		{ok, C} -> C
+	end,
 	ok = file:write_file(AppSrc, io_lib:format("~p.~n", [Conf])),
 	halt()
 endef
@@ -4740,7 +4765,7 @@ endef
 define dep_fetch_hex
 	mkdir -p $(ERLANG_MK_TMP)/hex $(DEPS_DIR)/$1; \
 	$(call core_http_get,$(ERLANG_MK_TMP)/hex/$1.tar,\
-		https://s3.amazonaws.com/s3.hex.pm/tarballs/$1-$(strip $(word 2,$(dep_$1))).tar); \
+		https://repo.hex.pm/tarballs/$1-$(strip $(word 2,$(dep_$1))).tar); \
 	tar -xOf $(ERLANG_MK_TMP)/hex/$1.tar contents.tar.gz | tar -C $(DEPS_DIR)/$1 -xzf -;
 endef
 
