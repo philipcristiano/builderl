@@ -6,7 +6,6 @@
          get_value/3,
          set_value/3]).
 
--define(STORAGE, builderl_ets_session_store).
 -define(SESSION_KEY, <<"session_id">>).
 
 request_start(Req) ->
@@ -17,14 +16,14 @@ request_start(Req) ->
 
 set_value(Key, Value, Cookies) ->
     SID = proplists:get_value(?SESSION_KEY, Cookies),
-    ?STORAGE:set_value(Key, Value, SID).
+    builderl_ets_session_store:set_value(Key, Value, SID).
 
 get_value(Key, Cookies) ->
     get_value(Key, Cookies, undefined).
 
 get_value(Key, Cookies, Default) ->
     SID = proplists:get_value(?SESSION_KEY, Cookies, Default),
-    ?STORAGE:get_value(Key, SID, Default).
+    builderl_ets_session_store:get_value(Key, SID, Default).
 
 
 init_cookies([], Req) ->
