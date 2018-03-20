@@ -45,6 +45,7 @@ ips-package: ips-prototype
 define IPS_TRANSFORM
 <transform dir path=usr$$ -> drop>
 <transform dir path=lib$$ -> drop>
+<transform dir path=lib/svc$$ -> drop>
 <transform dir path=lib/svc/manifest$$ -> drop>
 <transform dir path=lib/svc/manifest/application$$ -> drop>
 <transform dir path=opt$$ -> drop>
