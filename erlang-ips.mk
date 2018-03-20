@@ -43,12 +43,12 @@ ips-package: ips-prototype
 	pkglint ${IPS_TMP_DIR}/pkg.pm5.final
 
 define IPS_TRANSFORM
-<transform dir path=usr -> drop>
-<transform dir path=lib -> drop>
-<transform dir path=opt$ -> drop>
-<transform dir path=etc$ -> drop>
-<transform dir path=var$ -> drop>
-<transform dir path=var/lib$ -> drop>
+<transform dir path=usr$$ -> drop>
+<transform dir path=lib$$ -> drop>
+<transform dir path=opt$$ -> drop>
+<transform dir path=etc$$ -> drop>
+<transform dir path=var$$ -> drop>
+<transform dir path=var/lib$$ -> drop>
 <transform file path=(var|lib)/svc/manifest/.*\.xml$ -> default restart_fmri svc:/system/manifest-import:default>
 <transform file dir -> set owner builderl>
 <transform file dir -> set group builderl>
