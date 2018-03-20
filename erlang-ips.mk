@@ -22,17 +22,16 @@ export IPS_METADATA
 ips-prototype: rel
 	rm -rf ${IPS_BUILD_DIR} ${IPS_TMP_DIR}
 	mkdir -p ${IPS_BUILD_DIR}/opt/ ${IPS_TMP_DIR} "${IPS_BUILD_DIR}/etc"
-
 	cp -R _rel/${PROJECT}_release ${IPS_BUILD_DIR}/opt/${PROJECT}
 	rm ${IPS_BUILD_DIR}/opt/${PROJECT}/${PROJECT}_release-*.tar.gz
 
-	pkgsend generate ${IPS_BUILD_DIR} | pkgfmt > ${IPS_TMP_DIR}/pkg.pm5.1
 	cp LICENSE ${IPS_BUILD_DIR}/
 
 	# Store initial transform
 	echo "$$IPS_TRANSFORM" > ${IPS_TMP_DIR}/transform.mog
 
 ips-package: ips-prototype
+	pkgsend generate ${IPS_BUILD_DIR} | pkgfmt > ${IPS_TMP_DIR}/pkg.pm5.1
 	# Store metadata into a file
 	echo "$$IPS_METADATA" > ${IPS_TMP_DIR}/pkg.mog
 	for dep in ${IPS_DEPS}; do \
