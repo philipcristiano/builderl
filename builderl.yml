@@ -19,6 +19,7 @@ stages:
       - make tests
       - make elvis
       # - make dialyze
+      - make rel
       - make package
       - make ips-package
 
