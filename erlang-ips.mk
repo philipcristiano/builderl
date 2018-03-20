@@ -26,7 +26,7 @@ ips-prototype: rel
 	cp -R _rel/${PROJECT}_release ${IPS_BUILD_DIR}/opt/${PROJECT}
 	rm ${IPS_BUILD_DIR}/opt/${PROJECT}/${PROJECT}_release-*.tar.gz
 
-	pkgsend generate build | pkgfmt > ${IPS_TMP_DIR}/pkg.pm5.1
+	pkgsend generate ${IPS_BUILD_DIR} | pkgfmt > ${IPS_TMP_DIR}/pkg.pm5.1
 	cp LICENSE ${IPS_BUILD_DIR}/
 
 	# Store initial transform
