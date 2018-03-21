@@ -19,8 +19,10 @@ user username=${PROJECT} group=${PROJECT} home-dir=/opt/${PROJECT}
 endef
 export IPS_METADATA
 
-ips-prototype: rel
+ips-clean:
 	rm -rf ${IPS_BUILD_DIR} ${IPS_TMP_DIR}
+
+ips-prototype: rel
 	mkdir -p ${IPS_BUILD_DIR}/opt/ ${IPS_TMP_DIR} "${IPS_BUILD_DIR}/etc"
 	cp -R _rel/${PROJECT}_release ${IPS_BUILD_DIR}/opt/${PROJECT}
 	rm ${IPS_BUILD_DIR}/opt/${PROJECT}/${PROJECT}_release-*.tar.gz
