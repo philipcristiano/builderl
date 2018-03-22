@@ -1,0 +1,15 @@
+{% extends 'tmpl_base.dtl' %}
+{% load builderl_dtl_filters %}
+
+
+{% block title %}Builderl Login{% endblock %}
+
+{% block body %}
+<div class="row">
+
+    <a href="{{ gh_login }}">Login with Github</a>
+
+</div>
+
+{% endblock %}
+
