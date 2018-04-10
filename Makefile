@@ -42,8 +42,8 @@ script_modules = static/scripts/jquery-3.3.1.js \
 								 static/scripts/builderl.js
 style_modules = static/styles/bootstrap-4.0.0.css
 
-IPS_BUILD_DIR ?= erlang-pkgsrc
-IPS_TMP_DIR ?= tmp
+PKGSRC_BUILD_DIR ?= erlang-pkgsrc
+PKGSRC_TMP_DIR ?= tmp
 
 priv/static:
 	mkdir -p priv/static
@@ -59,12 +59,14 @@ static: priv/static priv/static/script.js priv/static/style.css
 	@echo 'DONE'
 
 pkgsrc: rel
-	rm -rf erlang-pkgsrc
+	rm -rf ${PKGSRC_BUILD_DIR}
 	mkdir -p erlang-pkgsrc
 	(cd rel; find * -type f -or -type l | sort) > pkgsrc-packlist
 	pkg_info -X pkg_install | egrep '^(MACHINE_ARCH|OPSYS|OS_VERSION|PKGTOOLS_VERSION)' > pkgsrc-build-info
 	echo ${PROJECT_DESCRIPTION} > pkgsrc-comment
 	echo ${PROJECT_DESCRIPTION} > pkgsrc-description
+	pkg_create -B pkgsrc-build-info -c pkgsrc-comment -d pkgsrc-description -f pkgsrc-packlist \
+  -I /opt/local -p rel -U ${PROJECT}-${PROJECT_VERSION}.tgz
 
 package: ips-prototype
 	# Builderl runtime directories
