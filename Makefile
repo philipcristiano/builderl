@@ -61,7 +61,7 @@ static: priv/static priv/static/script.js priv/static/style.css
 pkgsrc: rel
 	rm -rf ${PKGSRC_BUILD_DIR}
 	mkdir -p erlang-pkgsrc
-	rm _rel/builderl_release/*.tgz
+	rm _rel/builderl_release/*.tar.gz
 	(cd _rel/builderl_release; find * -type f -or -type l | sort) > pkgsrc-packlist
 	pkg_info -X pkg_install | egrep '^(MACHINE_ARCH|OPSYS|OS_VERSION|PKGTOOLS_VERSION)' > pkgsrc-build-info
 	echo ${PROJECT_DESCRIPTION} > pkgsrc-comment
