@@ -42,6 +42,9 @@ script_modules = static/scripts/jquery-3.3.1.js \
 								 static/scripts/builderl.js
 style_modules = static/styles/bootstrap-4.0.0.css
 
+IPS_BUILD_DIR ?= erlang-pkgsrc
+IPS_TMP_DIR ?= tmp
+
 priv/static:
 	mkdir -p priv/static
 
@@ -54,6 +57,14 @@ priv/static/style.css: ${style_modules}
 .PHONY: static
 static: priv/static priv/static/script.js priv/static/style.css
 	@echo 'DONE'
+
+pkgsrc: rel
+	rm -rf erlang-pkgsrc
+	mkdir -p erlang-pkgsrc
+	(cd rel; find * -type f -or -type l | sort) > pkgsrc-packlist
+	pkg_info -X pkg_install | egrep '^(MACHINE_ARCH|OPSYS|OS_VERSION|PKGTOOLS_VERSION)' > pkgsrc-build-info
+	echo ${PROJECT_DESCRIPTION} > pkgsrc-comment
+	echo ${PROJECT_DESCRIPTION} > pkgsrc-description
 
 package: ips-prototype
 	# Builderl runtime directories
@@ -80,6 +91,9 @@ endif
 
 .PHONY:test
 test: tests
+
+
+
 
 include erlang.mk
 include erlang-ips.mk
