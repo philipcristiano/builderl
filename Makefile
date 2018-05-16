@@ -75,7 +75,7 @@ pkgsrc: rel
 	echo ${PROJECT_DESCRIPTION} > pkgsrc-comment
 	echo ${PROJECT_DESCRIPTION} > pkgsrc-description
 	pkg_create -B pkgsrc-build-info -c pkgsrc-comment -d pkgsrc-description -f pkgsrc-packlist \
-  -I /opt/local -p _rel/builderl_release -U ${PROJECT}-${PROJECT_VERSION}.tgz
+  -I /opt/local -p ${PKGSRC_BUILD_DIR} -U ${PROJECT}-${PROJECT_VERSION}.tgz
 
 package: ips-prototype
 	# Builderl runtime directories
