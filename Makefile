@@ -61,6 +61,7 @@ static: priv/static priv/static/script.js priv/static/style.css
 pkgsrc: rel
 	rm -rf ${PKGSRC_BUILD_DIR}
 	mkdir -p ${PKGSRC_BUILD_DIR}
+	mkdir -p signed
 
 	# SMF setup
 	mkdir -p ${PKGSRC_BUILD_DIR}/lib/svc/manifest
@@ -76,6 +77,8 @@ pkgsrc: rel
 	echo ${PROJECT_DESCRIPTION} > pkgsrc-description
 	pkg_create -B pkgsrc-build-info -c pkgsrc-comment -d pkgsrc-description -f pkgsrc-packlist \
   -I /opt/local -p ${PKGSRC_BUILD_DIR} -U ${PROJECT}-${PROJECT_VERSION}.tgz
+
+	pkg_admin gpg-sign-package ${PROJECT}-${PROJECT_VERSION}.tgz signed/${PROJECT}-${PROJECT_VERSION}.tgz
 
 package: ips-prototype
 	# Builderl runtime directories
