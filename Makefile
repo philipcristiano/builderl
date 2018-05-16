@@ -60,9 +60,17 @@ static: priv/static priv/static/script.js priv/static/style.css
 
 pkgsrc: rel
 	rm -rf ${PKGSRC_BUILD_DIR}
-	mkdir -p erlang-pkgsrc
+	mkdir -p ${PKGSRC_BUILD_DIR}
+
+	# SMF setup
+	mkdir -p ${PKGSRC_BUILD_DIR}/lib/svc/manifest
+
 	rm _rel/builderl_release/*.tar.gz
-	(cd _rel/builderl_release; find * -type f -or -type l | sort) > pkgsrc-packlist
+	cp smf.xml ${PKGSRC_BUILD_DIR}/lib/svc/manifest/${PROJECT}.xml
+	cp epmd.xml ${PKGSRC_BUILD_DIR}/lib/svc/manifest/${PROJECT}-epmd.xml
+	cp -R _rel/builderl_release/* ${PKGSRC_BUILD_DIR}
+
+	(cd ${PKGSRC_BUILD_DIR}; find * -type f -or -type l | sort) > pkgsrc-packlist
 	pkg_info -X pkg_install | egrep '^(MACHINE_ARCH|OPSYS|OS_VERSION|PKGTOOLS_VERSION)' > pkgsrc-build-info
 	echo ${PROJECT_DESCRIPTION} > pkgsrc-comment
 	echo ${PROJECT_DESCRIPTION} > pkgsrc-description
