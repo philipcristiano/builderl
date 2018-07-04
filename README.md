@@ -26,7 +26,7 @@ CC=gcc CXX="/usr/bin/g++" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5/bin:$PATH 
 ### Packaging
 
 ```
-PKGSRVR="$SERVER" CC=gcc CXX="/usr/bin/g++ -m64" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make rel package publish
+PKGSRVR="$SERVER" CC=gcc CXX="/usr/bin/g++ -m64" PATH=/usr/gnu/bin:/opt/omni/bin/:/opt/gcc-5.1.0/bin:$PATH make deps app rel static package publish
 ```
 
 Then post in a build file
