@@ -29,6 +29,7 @@
             <method_credential user='builderl' group='builderl' privileges='basic,PRIV_NET_PRIVADDR'/>
             <method_environment>
                 <envvar name="HOME" value="/opt/builderl"/>
+                <envvar name="PATH" value="/usr/gnu/bin:/usr/sbin:/sbin:/usr/bin"/>
             </method_environment>
         </method_context>
 
