@@ -44,6 +44,14 @@ ips-package: ips-prototype
 
 	pkglint ${IPS_TMP_DIR}/pkg.pm5.final
 
+publish: ips-package
+ifndef PKGSRVR
+	echo "Need to define PKGSRVR, something like http://localhost:10000"
+	exit 1
+endif
+	pkgsend publish -s ${PKGSRVR} -d ${IPS_BUILD_DIR} ${IPS_TMP_DIR}/pkg.pm5.final
+	pkgrepo refresh -s ${PKGSRVR}
+
 define IPS_TRANSFORM
 <transform dir path=usr$$ -> drop>
 <transform dir path=lib$$ -> drop>

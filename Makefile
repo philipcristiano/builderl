@@ -70,14 +70,6 @@ package: ips-prototype
 	cp omnios.config "${IPS_BUILD_DIR}/etc/${PROJECT}.config"
 	$(call add-ips-transform, "<transform file path=etc/builderl.config -> add preserve true>")
 
-publish: ips-package
-ifndef PKGSRVR
-	echo "Need to define PKGSRVR, something like http://localhost:10000"
-	exit 1
-endif
-	pkgsend publish -s ${PKGSRVR} -d ${IPS_BUILD_DIR} ${IPS_TMP_DIR}/pkg.pm5.final
-	pkgrepo refresh -s ${PKGSRVR}
-
 .PHONY:test
 test: tests
 
